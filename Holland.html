@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Το Τρίγωνο του Χόλαντ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700;800&display=swap">
+<style>
+/* Φύλλο εργασίας: μία στήλη, βήματα 1→6, το εξάγωνο ως κεντρικό όργανο· δύο ακόμη προβολές (τάξη, οδηγός) με καρτέλες */
+:root{
+  --bg:#f3f5f8; --paper:#ffffff; --ink:#1b2433; --muted:#5b6678; --line:#d8dee8; --accent:#2f5bd3;
+  --R:#c2571a; --I:#2f6fb5; --A:#9b3fa8; --S:#2c8a5a; --E:#c0392b; --C:#5e6b7d;
+  --tri:rgba(47,91,211,.12); --radar:rgba(27,36,51,.10); --warn:#a35b00; --ok:#1f7a4a; --soft:#e9edf3; --hl:#fff4cc;
+  --font:"Commissioner",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12161d; --paper:#1a2029; --ink:#e7ebf2; --muted:#9aa5b6; --line:#2d3644; --accent:#7ea2ff;
+  --R:#f08a4b; --I:#6aa8f0; --A:#cf7bdc; --S:#5cc48f; --E:#f0756a; --C:#a3afc0;
+  --tri:rgba(126,162,255,.16); --radar:rgba(231,235,242,.10); --warn:#f0b35a; --ok:#5cc48f; --soft:#242b36; --hl:#4a3f12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161d; --paper:#1a2029; --ink:#e7ebf2; --muted:#9aa5b6; --line:#2d3644; --accent:#7ea2ff;
+  --R:#f08a4b; --I:#6aa8f0; --A:#cf7bdc; --S:#5cc48f; --E:#f0756a; --C:#a3afc0;
+  --tri:rgba(126,162,255,.16); --radar:rgba(231,235,242,.10); --warn:#f0b35a; --ok:#5cc48f; --soft:#242b36; --hl:#4a3f12; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav.tabs a{padding:8px 14px;font-weight:700;font-size:14px;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-1px}
+nav.tabs a[aria-current="page"]{color:var(--ink);border-color:var(--accent)}
+nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header h1{font-size:clamp(26px,6vw,36px);font-weight:800;letter-spacing:-.02em;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:64ch}
+.meta{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-top:16px}
+@media (max-width:520px){.meta{grid-template-columns:1fr 1fr}.meta .name{grid-column:1/-1}}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600;min-width:0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-width:0;width:100%}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+section.step{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.step h2{margin:0;font-size:18px;font-weight:700;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.step h2 .n{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.step h3{margin:0;font-size:14px;font-weight:700}
+.hint{margin:0;color:var(--muted);font-size:13.5px}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:520px){.scores{grid-template-columns:repeat(2,1fr)}}
+.score{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+.score .dot{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.score span.lb{flex:1;min-width:0;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.score input{width:64px;text-align:right;font-variant-numeric:tabular-nums;padding:6px}
+.order{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.ex{color:var(--warn)}
+.msg{font-size:13.5px;margin:0}
+.msg.warn{color:var(--warn)}
+.hexrow{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:620px){.hexrow{grid-template-columns:1fr}}
+.hexbox svg{width:100%;max-width:460px;height:auto;display:block;margin:0 auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.code{font-size:40px;font-weight:800;letter-spacing:.08em;line-height:1;display:flex;gap:4px}
+.types{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.types li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:13.5px}
+.types li b{display:block;font-size:14.5px}
+.types .k{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+details.explain{border:1px solid var(--line);border-radius:8px;padding:0 14px;background:var(--bg)}
+details.explain summary{cursor:pointer;font-weight:700;font-size:14px;padding:11px 0}
+details.explain[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+details.explain .body{display:flex;flex-direction:column;gap:10px;padding-bottom:14px;font-size:13.5px;max-width:72ch}
+details.explain p{margin:0}
+details.explain dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 12px}
+@media (max-width:520px){details.explain dl{grid-template-columns:1fr}}
+details.explain dt{font-weight:700}
+details.explain dd{margin:0}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;min-width:420px;width:100%}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+.tbl th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .l{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .s{font-size:12.5px;color:var(--muted);line-height:1.35}
+.chip{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;width:max-content}
+.chip.hi{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.chip.md{background:var(--soft);color:var(--ink)}
+.chip.lo{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.charts{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+@media (max-width:620px){.charts{grid-template-columns:1fr}}
+.chart{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:110px minmax(0,1fr) 40px;gap:8px;align-items:center;font-size:13px}
+.bar .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .tr{position:relative;height:16px;background:var(--soft);border-radius:3px}
+.bar .fl{position:absolute;inset:0 auto 0 0;border-radius:3px}
+.bar .mean{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.55}
+.bar .vl{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.axis{display:grid;grid-template-columns:110px minmax(0,1fr) 40px;gap:8px;font-size:11.5px;color:var(--muted)}
+.axis div:nth-child(2){display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.read{font-size:13.5px;margin:0;border-top:1px solid var(--line);padding-top:10px}
+.skills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.skills{grid-template-columns:1fr}}
+.skillcol{border-top:3px solid var(--c);padding-top:8px;min-width:0}
+.skillcol b{color:var(--c);font-size:14px}
+.skillcol ul{margin:6px 0 0;padding-left:18px;font-size:13px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.toolbar label.f{flex:1 1 200px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:99px;padding:5px 12px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.filters button:disabled{opacity:.45;cursor:default}
+.filters button span{font-variant-numeric:tabular-nums;opacity:.75;margin-left:4px}
+.jobs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+@media (max-width:600px){.jobs{grid-template-columns:1fr}}
+.job{border:1px solid var(--line);border-radius:8px;padding:10px 12px;height:100%;display:flex;flex-direction:column;gap:6px;min-width:0}
+.job.m3{border-left:4px solid var(--ok)}
+.job.on{border-color:var(--accent);background:var(--tri)}
+.job .top{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.job input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--accent)}
+.job .t{font-weight:700;line-height:1.3}
+.job .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.jc{font-weight:800;letter-spacing:.06em;font-size:13px}
+.match{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:99px;font-variant-numeric:tabular-nums}
+.match.m3{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.match.m2{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.match.m1{background:var(--soft);color:var(--muted)}
+.dem{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:4px;background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ok)}
+.tag{font-size:11.5px;font-weight:600;padding:1px 7px;border-radius:4px;background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.sk{font-size:12px;color:var(--muted);line-height:1.45;display:flex;flex-direction:column;gap:1px}
+.sk i{font-style:normal;font-weight:800;display:inline-block;width:14px}
+details.uni{font-size:12.5px}
+details.uni summary{cursor:pointer;color:var(--accent);font-weight:700}
+details.uni .d{margin-top:6px}
+details.uni .d b{display:block;font-size:12.5px}
+details.uni .cities{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 6px}
+details.uni .cities span{font-size:11.5px;padding:1px 6px;border-radius:4px;background:var(--soft)}
+details.uni .cities span.near{background:var(--hl);font-weight:700}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;margin:0}
+.assess{display:flex;flex-direction:column;gap:6px}
+.arow{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13.5px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.arow .L{font-weight:800}
+.seg{display:flex;gap:3px}
+.seg button{font:inherit;font-size:13px;font-weight:700;width:30px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.split{grid-template-columns:1fr}}
+.box{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px}
+.box ul{margin:4px 0 0;padding-left:18px}
+.q{display:flex;flex-direction:column;gap:6px}
+.q span{font-weight:600;font-size:14px}
+textarea{min-height:72px;resize:vertical}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;font-size:15px;background:var(--accent);color:var(--paper);border:0;border-radius:8px;padding:11px 18px;cursor:pointer}
+.btn.sec{background:var(--paper);color:var(--accent);border:1px solid var(--accent)}
+.btn:disabled{opacity:.6;cursor:progress}
+.codebox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:var(--bg);border:1px dashed var(--line);border-radius:6px;padding:8px 10px;word-break:break-all;user-select:all}
+footer{color:var(--muted);font-size:12.5px;max-width:70ch}
+.guide{font-size:14.5px;max-width:70ch;display:flex;flex-direction:column;gap:12px}
+.guide h3{font-size:16px;margin:8px 0 0}
+.guide ol,.guide ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px}
+.guide p{margin:0}
+.time{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent)}
+@media print{nav.tabs,footer,.print-note{display:none!important}body{background:#fff!important;padding:0!important}#v-print>div{border:0!important;padding:0!important;overflow:visible!important}.avoid,tr{break-inside:avoid}}
+#pdfstage{position:fixed;left:-12000px;top:0;width:700px;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.bar .fl{transition:width .35s ease}}
+</style>
+
+<div class="wrap">
+<!-- ============ ΜΑΘΗΤΗΣ ============ -->
+<div id="v-student" style="display:flex;flex-direction:column;gap:20px">
+<header>
+  <h1>Το Τρίγωνο του Χόλαντ</h1>
+  <p>Φύλλο εργασίας για την Α΄ Λυκείου. Γράψε τις βαθμολογίες σου από το ψηφιακό ερωτηματολόγιο ενδιαφερόντων του ΕΟΠΠΕΠ. Οι τρεις υψηλότεροι τύποι σχηματίζουν το δικό σου τρίγωνο στο εξάγωνο.</p>
+  <div class="meta">
+    <label class="f name">Ονοματεπώνυμο<input id="st-name" type="text" autocomplete="off"></label>
+    <label class="f">Τμήμα<input id="st-class" type="text" placeholder="Α1"></label>
+    <label class="f">Ημερομηνία<input id="st-date" type="date"></label>
+  </div>
+</header>
+
+<section class="step">
+  <h2><span class="n">Βήμα 1</span>Οι βαθμολογίες σου</h2>
+  <p class="hint">Μετέφερε τον αριθμό που σου έδωσε το ερωτηματολόγιο για κάθε τύπο. <span class="pill ex" id="ex-pill">Παράδειγμα· άλλαξέ τις</span></p>
+  <div class="scores" id="scores"></div>
+</section>
+
+<section class="step">
+  <h2><span class="n">Βήμα 2</span>Το τρίγωνό σου</h2>
+  <p class="hint">Η σειρά συμπληρώνεται αυτόματα. Μπορείς να την αλλάξεις με το χέρι, π.χ. σε ισοβαθμία.</p>
+  <div class="order">
+    <label class="f">1ος τύπος<select id="o1"></select></label>
+    <label class="f">2ος τύπος<select id="o2"></select></label>
+    <label class="f">3ος τύπος<select id="o3"></select></label>
+  </div>
+  <p class="msg warn" id="msg" hidden></p>
+  <div class="hexrow">
+    <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+      <div class="hexbox" id="hex" role="img" aria-label="Εξάγωνο του Χόλαντ με το προφίλ βαθμολογιών και το τρίγωνο των τριών κυρίαρχων τύπων"></div>
+      <div class="legend"><span><i style="background:var(--radar);border:1px solid var(--muted)"></i>Όλο το προφίλ σου (και οι 6 τύποι)</span><span><i style="background:var(--tri);border:2px solid var(--accent)"></i>Το τρίγωνο των 3 κυρίαρχων</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <div><div style="font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Κωδικός Χόλαντ</div>
+      <div class="code" id="code"></div></div>
+      <ol class="types" id="types"></ol>
+    </div>
+  </div>
+  <details class="explain">
+    <summary>Γιατί φαίνεται και το γκρι σχήμα πίσω από το τρίγωνο;</summary>
+    <div class="body">
+      <p>Το τρίγωνο δείχνει μόνο ποιοι είναι οι τρεις πρώτοι τύποι. Δεν δείχνει πόσο δυνατός είναι ο καθένας ούτε πόσο κοντά τους βρίσκονται οι άλλοι τρεις. Το γκρι σχήμα είναι όλο το προφίλ σου: κάθε κορυφή του φτάνει τόσο μακριά όσο υψηλή είναι η βαθμολογία σου στον αντίστοιχο τύπο.</p>
+      <p><b>Πώς το διαβάζεις:</b> αν το γκρι σχήμα «γεμίζει» το τρίγωνο, το τρίγωνό σου είναι καθαρό. Αν απλώνεται σχεδόν το ίδιο προς έναν 4ο τύπο, τα ενδιαφέροντά σου είναι πιο πλατιά και αξίζει να δεις και το διπλανό τρίγωνο. Αν είναι μικρό και στρογγυλό, δεν έχει ξεκαθαρίσει ακόμα κάποιο έντονο ενδιαφέρον.</p>
+    </div>
+  </details>
+</section>
+
+<section class="step">
+  <h2><span class="n">Βήμα 3</span>Τι δείχνουν τα δεδομένα σου</h2>
+  <div class="kpis" id="kpis"></div>
+  <div class="charts">
+    <div class="chart">
+      <h3>Βαθμολογίες ανά τύπο</h3>
+      <div class="bars" id="bars"></div>
+      <div class="axis" id="axis"></div>
+      <p class="hint" style="font-size:12px">Η κάθετη γραμμή δείχνει τον μέσο όρο των έξι τύπων.</p>
+    </div>
+    <div class="chart">
+      <h3>Τα 30 επαγγέλματα ανά διαδρομή</h3>
+      <div class="bars" id="paths"></div>
+      <h3 style="margin-top:6px">…και ανά βαθμό ταύτισης</h3>
+      <div class="bars" id="tiers"></div>
+    </div>
+  </div>
+  <p class="read" id="read"></p>
+  <details class="explain">
+    <summary>Τι σημαίνουν οι τέσσερις δείκτες</summary>
+    <div class="body">
+      <dl>
+        <dt>Συνέπεια</dt><dd>Πόσο κοντά είναι ο 1ος και ο 2ος τύπος στο εξάγωνο. Γειτονικοί τύποι (π.χ. R–I) = υψηλή, μία κορυφή απόσταση (R–A) = μέτρια, απέναντι (R–S) = χαμηλή. Η χαμηλή συνέπεια δεν είναι κακό· σημαίνει ότι θα ψάξεις ρόλους που συνδυάζουν διαφορετικά πράγματα.</dd>
+        <dt>Διαφοροποίηση</dt><dd>Ο <b>δείκτης Iachan</b> (1984): η υψηλότερη βαθμολογία μείον τον μέσο όρο της 2ης και της 4ης, ως ποσοστό της υψηλότερης. Υψηλή = ξεκάθαρα κυρίαρχο ενδιαφέρον. Χαμηλή = επίπεδο προφίλ: είτε πλατιά ενδιαφέροντα, είτε ενδιαφέροντα που δεν έχουν ξεκαθαρίσει ακόμη, κάτι πολύ συνηθισμένο στα 15–16.</dd>
+        <dt>Συγκέντρωση</dt><dd>Τι ποσοστό των συνολικών μονάδων σου πέφτει στους τρεις τύπους του τριγώνου. Αν όλοι οι τύποι ήταν ίσοι θα ήταν 50%.</dd>
+        <dt>Σαφήνεια</dt><dd>Πόσο απέχει ο 3ος τύπος από τον 4ο. Κοντά στο μηδέν σημαίνει ότι το τρίγωνο θα μπορούσε εύκολα να είναι άλλο.</dd>
+      </dl>
+      <p>Τα όρια «υψηλή / μέτρια / χαμηλή» είναι ενδεικτικά. Το ερωτηματολόγιο του ΕΟΠΠΕΠ δεν δίνει ελληνικές νόρμες γι' αυτούς τους δείκτες.</p>
+    </div>
+  </details>
+</section>
+
+<section class="step">
+  <h2><span class="n">Βήμα 4</span>Επαγγέλματα του τριγώνου σου</h2>
+  <p class="hint" id="jobs-hint"></p>
+  <div class="skills" id="skills"></div>
+  <details class="explain">
+    <summary>Έχει σημασία αν είσαι RIA ή ARI ή IRA; Τι είναι το ποσοστό ταύτισης;</summary>
+    <div class="body">
+      <p>Το τρίγωνο είναι το ίδιο, άρα και η λίστα των 30 επαγγελμάτων είναι η ίδια. <b>Η σειρά όμως αλλάζει ποια επαγγέλματα σου ταιριάζουν περισσότερο.</b> Κάθε επάγγελμα έχει κι αυτό τον δικό του κωδικό. Ο Αρχιτέκτονας είναι AIR, ο Τοπογράφος RIA. Ένας μαθητής RIA ταιριάζει περισσότερο με τον Τοπογράφο, ένας ARI με τον Αρχιτέκτονα.</p>
+      <p>Το <b>ποσοστό ταύτισης</b> υπολογίζεται με τον <b>δείκτη συμφωνίας M του Iachan</b>. Συγκρίνει τον δικό σου κωδικό με τον κωδικό του επαγγέλματος θέση προς θέση (μέγιστο 28 = 100%).</p>
+      <div class="tbl"><table><thead><tr><th>Κωδικός επαγγέλματος σε σχέση με τον δικό σου ΑΒΓ</th><th>Μονάδες</th><th>Ταύτιση</th></tr></thead><tbody>
+        <tr><td>ΑΒΓ (ίδια σειρά)</td><td>28</td><td>100% · Πλήρης</td></tr>
+        <tr><td>ΑΓΒ (ίδιο 1ο γράμμα)</td><td>26</td><td>93% · Υψηλή</td></tr>
+        <tr><td>ΒΑΓ (αντιστροφή 1ου–2ου)</td><td>21</td><td>75% · Υψηλή</td></tr>
+        <tr><td>ΒΓΑ / ΓΑΒ</td><td>16</td><td>57% · Μέτρια</td></tr>
+        <tr><td>ΓΒΑ (αντίστροφη σειρά)</td><td>13</td><td>46% · Μέτρια</td></tr>
+      </tbody></table></div>
+      <p>Όλα τα επαγγέλματα της λίστας ανήκουν στο τρίγωνό σου. Ακόμη και η «μέτρια» ταύτιση είναι καλή επιλογή. Οι κωδικοί των επαγγελμάτων είναι προσαρμογή στην ελληνική πραγματικότητα με βάση τη λογική του O*NET. Δεν είναι επίσημη ελληνική ταξινόμηση.</p>
+    </div>
+  </details>
+  <div class="toolbar">
+    <label class="f">Θέλω να σπουδάσω κοντά σε…<select id="city"><option value="">Οποιαδήποτε πόλη</option></select></label>
+    <div class="filters" id="filters" role="group" aria-label="Φίλτρο διαδρομής σπουδών"></div>
+  </div>
+  <ul class="jobs" id="jobs"></ul>
+  <p class="count" id="picked"></p>
+  <details class="explain">
+    <summary>Οδηγός διαδρομών σπουδών και ζήτησης στην αγορά εργασίας</summary>
+    <div class="body">
+      <dl>
+        <dt>ΑΕΙ · Πεδίο</dt><dd>Πανεπιστήμιο, με <b>Πανελλαδικές</b> στη Γ΄ Λυκείου και ελάχιστη βάση εισαγωγής (ΕΒΕ). Το πεδίο δείχνει ποια ομάδα προσανατολισμού διαλέγεις στη Γ΄:
+          <br><b>1</b> Ανθρωπιστικές, Νομικές & Κοινωνικές Επιστήμες → ομάδα Ανθρωπιστικών Σπουδών
+          <br><b>2</b> Θετικές & Τεχνολογικές Επιστήμες → ομάδα Θετικών Σπουδών
+          <br><b>3</b> Επιστήμες Υγείας & Ζωής → ομάδα Σπουδών Υγείας
+          <br><b>4</b> Επιστήμες Οικονομίας & Πληροφορικής → ομάδα Σπουδών Οικονομίας & Πληροφορικής
+          <br>Πάτα «Πού σπουδάζεις» σε κάθε επάγγελμα για να δεις τα τμήματα με πόλη. Τα τμήματα προέρχονται από το Μηχανογραφικό Δελτίο 2026 του Υπουργείου Παιδείας. Όπου γράφει «ειδικό μάθημα», το τμήμα ζητά και ειδική εξέταση (σχέδιο, ξένη γλώσσα, μουσικά, αθλητικά).</dd>
+        <dt>ΣΑΕΚ</dt><dd>Σχολές Ανώτερης Επαγγελματικής Κατάρτισης, τα πρώην ΙΕΚ. Μετά το Λύκειο (ΓΕΛ ή ΕΠΑΛ), <b>χωρίς Πανελλαδικές</b>. Περίπου 2–2,5 χρόνια, με πρακτική άσκηση σε επιχείρηση. Στο τέλος δίνεις εξετάσεις πιστοποίησης και παίρνεις δίπλωμα επιπέδου 5. Οι δημόσιες είναι δωρεάν.</dd>
+        <dt>ΕΠΑΛ · Τομέας</dt><dd>Επαγγελματικό Λύκειο: διαλέγεις <b>τομέα στη Β΄</b> και ειδικότητα στη Γ΄. Παίρνεις απολυτήριο και πτυχίο ειδικότητας επιπέδου 4. Μπορείς να συνεχίσεις σε ΑΕΙ (Πανελλαδικές ΕΠΑΛ), σε ΣΑΕΚ ή στο μεταλυκειακό έτος–τάξη μαθητείας.</dd>
+        <dt>Ειδικές σχολές</dt><dd><b>Στρατιωτικές</b> και <b>Σωμάτων Ασφαλείας</b>: Πανελλαδικές συν ιατρικές και αθλητικές δοκιμασίες. <b>Ακαδημίες Εμπορικού Ναυτικού</b>: Πανελλαδικές. <b>Δραματικές σχολές / Χορού</b>: δικές τους εξετάσεις. <b>Ωδείο</b>: πτυχίο/δίπλωμα ωδείου. <b>Σχολή Ξεναγών</b>: μετά το Λύκειο. <b>Άδεια/πιστοποίηση</b>: ιδιωτική σχολή και άδεια άσκησης. <b>Διαγωνισμός δημοσίου</b>: μέσω ΑΣΕΠ ή ειδικού διαγωνισμού.</dd>
+        <dt>Ζήτηση</dt><dd>Η πράσινη ετικέτα δείχνει ότι ο <b>κλάδος</b> του επαγγέλματος έχει σήμερα αυξημένη ζήτηση ή ελλείψεις προσωπικού στην Ελλάδα. Πηγές: Cedefop Skills Forecast Ελλάδα 2025, έρευνα ManpowerGroup 2025, ΣΕΒ/ΟΚΕ για τις τεχνικές ειδικότητες. Αφορά τον κλάδο και όχι το συγκεκριμένο επάγγελμα. Η απουσία ετικέτας δεν σημαίνει ότι δεν υπάρχουν θέσεις.</dd>
+      </dl>
+      <p>Οι Πανελλαδικές για όσους είναι σήμερα στην Α΄ Λυκείου γίνονται το 2029. Οι κανόνες και τα τμήματα μπορεί να αλλάξουν ως τότε, οπότε έλεγξε τα τρέχοντα στοιχεία με τον σύμβουλο σταδιοδρομίας.</p>
+    </div>
+  </details>
+</section>
+
+<section class="step">
+  <h2><span class="n">Βήμα 5</span>Πόσο έχεις ήδη αυτές τις δεξιότητες;</h2>
+  <p class="hint" id="assess-hint"></p>
+  <div class="assess" id="assess"></div>
+  <div class="split" id="assess-sum"></div>
+</section>
+
+<section class="step">
+  <h2><span class="n">Βήμα 6</span>Σκέψου, γράψε, παράδωσε</h2>
+  <label class="q"><span>1. Συμφωνείς με το τρίγωνό σου; Τι σου λένε οι δείκτες του Βήματος 3;</span><textarea id="q1"></textarea></label>
+  <label class="q"><span>2. Διάλεξε δύο επαγγέλματα που τσέκαρες. Ποιες δεξιότητες έχεις ήδη και ποιες θέλεις να αναπτύξεις;</span><textarea id="q2"></textarea></label>
+  <label class="q"><span>3. Ποια διαδρομή σπουδών και ποια πόλη σε ενδιαφέρουν; Τι πρέπει να ψάξεις ακόμα;</span><textarea id="q3"></textarea></label>
+  <div class="actions">
+    <button class="btn" type="button" id="pdf-btn">Λήψη PDF για εκτύπωση</button>
+    <button class="btn sec" type="button" id="print-btn">Εκτύπωση όλων των βημάτων</button>
+    <span class="hint" id="pdf-msg">Το PDF και η εκτύπωση περιέχουν και τα 6 βήματα: βαθμολογίες, τρίγωνο, δείκτες, τα 30 επαγγέλματα με τις σχολές των τσεκαρισμένων, την αυτοαξιολόγηση και τις απαντήσεις σου.</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <h3>Κωδικός για τον εκπαιδευτικό</h3>
+    <p class="hint">Αν σου το ζητήσει ο εκπαιδευτικός, αντίγραψε αυτή τη γραμμή και στείλ' τη του (π.χ. με email ή στο e-class). Δεν περιέχει το όνομά σου. Υπάρχει και στο τέλος του PDF.</p>
+    <div class="codebox" id="classcode"></div>
+    <div class="actions"><button class="btn sec" type="button" id="copy-code">Αντιγραφή</button><span class="hint" id="copy-msg"></span></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:12px">
+    <h3>Τελείωσες;</h3>
+    <p class="hint">Αν δουλεύεις σε κοινόχρηστο υπολογιστή του σχολείου, κατέβασε πρώτα το PDF και μετά καθάρισε τη φόρμα για τον επόμενο συμμαθητή σου.</p>
+    <div class="actions"><button class="btn sec" type="button" id="reset-btn">Καθαρισμός για νέο μαθητή</button><span class="hint" id="reset-msg"></span></div>
+  </div>
+</section>
+</div>
+
+<div id="v-print" hidden style="display:flex;flex-direction:column;gap:14px">
+  <div class="print-note step" style="background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px">
+    <b>Σελίδα εκτύπωσης</b>
+    <p class="hint" style="margin-top:4px">Από εδώ μπορείς να τυπώσεις ή να αποθηκεύσεις PDF από τον browser: πάτα <b>Ctrl+P</b> (Mac: <b>Cmd+P</b>) και διάλεξε «Αποθήκευση ως PDF». <a href="#">← Επιστροφή στο φύλλο</a></p>
+    <div class="actions" style="margin-top:8px"><button class="btn" type="button" id="print-now">Εκτύπωση</button><button class="btn sec" type="button" id="pdf-btn2">Λήψη PDF</button><span class="hint" id="pdf-msg2"></span></div>
+  </div>
+  <div style="overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px"><div id="print-body"></div></div>
+</div>
+
+<footer>Οι λίστες είναι ενδεικτικές και προσαρμοσμένες στις διαδρομές σπουδών της Ελλάδας. Ο κωδικός Χόλαντ δείχνει ενδιαφέροντα, όχι ικανότητες ή «σωστό» επάγγελμα. Τμήματα ΑΕΙ: Μηχανογραφικό Δελτίο 2026 (ΥΠΑΙΘΑ). Ζήτηση κλάδων: Cedefop 2025, ManpowerGroup 2025, ΣΕΒ/ΟΚΕ. Οι απαντήσεις σου αποθηκεύονται μόνο σε αυτόν τον browser· δεν στέλνονται πουθενά.</footer>
+</div>
+<div id="pdfstage" aria-hidden="true"></div>
+
+<script>
+const RAW={
+RIA:`Αρχιτέκτονας|AIR|@arch|A02I03R36
+Βιομηχανικός σχεδιαστής (σχεδιάζει προϊόντα)|ARI|@design|A08R13I04
+Τοπογράφος|RIA|@topo|R34I18A16
+Οδοντοτεχνίτης|RIA|@biomed k|R69I25A79
+Τεχνικός ήχου σε συναυλίες|RAI|k|R02A57I46
+Φωτογράφος|ARI|k @film|A27R06I56
+Κοσμηματοποιός|ARI|k eT|A09R61I45
+Φωτιστής θεάτρου|RAI|k|R07A27I46
+3D designer (τρισδιάστατα γραφικά)|ARI|k|A68R36I46
+Καμεραμάν – κινηματογραφιστής|ARI|@film k|A27R04I45
+Ναυπηγός|RIA|@naval|R31I12A06
+Σχεδιαστής αυτοκινήτων|ARI|@design @mech|A16R13I04
+Οργανοποιός (φτιάχνει μουσικά όργανα)|RAI|k|R69A59I45
+Αρχιτέκτονας τοπίου (σχεδιάζει πάρκα)|AIR|@arch @agri|A02I23R38
+Ειδικός οπτικών εφέ (VFX)|AIR|k @film|A68I46R36
+Τεχνίτης βιτρό|RAI|k|R69A12I45
+Μακετίστας|RAI|k eD|R36A19I35
+Χειριστής drone|RIA|k sL|R47I56A26
+Συντηρητής αρχαιοτήτων|IRA|@conserv|I25R69A79
+Σχεδιαστής κτιρίων στον υπολογιστή (BIM)|RIA|k @civ|R13I16A26
+Σχεδιαστής φωτισμού κτιρίων|AIR|@arch @elec|A27I24R03
+Ηχολήπτης σε στούντιο ηχογραφήσεων|RAI|k @musictech|R09A57I46
+Μηχανικός ακουστικής|IRA|@musictech @physics|I12R03A57
+Γεωπληροφορικός (χάρτες από δορυφόρους)|IRA|@topo @geog|I68R34A26
+Γραφίστας βιντεοπαιχνιδιών (game artist)|AIR|k @ceid|A16I46R36
+Developer εικονικής πραγματικότητας (VR)|IRA|@ceid|I46R03A68
+Ξυλογλύπτης|RAI|k eT|R69A19I45
+Σιδεράς καλλιτεχνικών κατασκευών|RAI|k eM|R15A09I45
+Υαλουργός (φυσητό γυαλί)|RAI|k|R56A09I25
+Αρχαιομέτρης|IRA|@hist @physics @chem|I25R69A79`,
+RIS:`Φυσικοθεραπευτής|SRI|@physio|S14R56I45
+Εργοθεραπευτής|SRI|@ot|S12R06I45
+Κτηνίατρος|IRS|@vet|I24R89S14
+Οπτικός (γυαλιά και φακοί επαφής)|RIS|@biomed|R69I45S07
+Ακτινολόγος τεχνολόγος (κάνει ακτινογραφίες)|RIS|@biomed|R79I25S49
+Γεωπόνος|IRS|@agri|I23R08S03
+Διασώστης ΕΚΑΒ|RSI|k|R45S49I45
+Βοηθός φυσικοθεραπευτή|SRI|k eY|S24R56I45
+Τεχνικός ακουστικών βαρηκοΐας|RIS|k|R69I45S26
+Ορθοπεδικός τεχνικός (νάρθηκες, πάτοι)|RIS|k|R16I45S47
+Τεχνικός ιατρικών μηχανημάτων|RIS|k @biomedeng|R29I46S07
+Δασολόγος|IRS|@forest|I25R58S05
+Ιχθυοκαλλιεργητής|IRS|@fish|I25R58S25
+Βοηθός κτηνιάτρου|RSI|k eG|R89S24I45
+Εκπαιδευτής σκύλων|RSI|k|R58S23I35
+Νοσηλευτής εντατικής (ΜΕΘ)|SIR|@nurse|S49I45R79
+Οδοντίατρος|ISR|@dent|I24S09R69
+Γυμναστής ΑμεΑ (ειδική φυσική αγωγή)|SRI|@pe|S23R05I45
+Μασέρ – θεραπευτής μασάζ|RSI|k eY|R56S49I25
+Βοηθός οδοντιάτρου|RSI|k eY|R79S49I25
+Ποδολόγος|RSI|k|R69S47I45
+Χειρουργός|IRS|@med|I24R69S19
+Γιατρός αποκατάστασης|ISR|@med|I24S12R59
+Τεχνικός προσθετικών μελών|RIS|k|R16I45S14
+Ζωοτέχνης|IRS|@animal|I25R89S05
+Ναυαγοσώστης|RSI|sL|R57S49I45
+Ιατρικός φυσικός|IRS|@physics|I12R79S05
+Δασοπυροσβέστης|RSI|sA|R57S59I45
+Τεχνικός περιβάλλοντος – ανακύκλωσης|RIS|k eG|R78I25S05
+Βιοϊατρικός μηχανικός|IRS|@biomedeng|I26R29S05`,
+RIE:`Μηχανολόγος μηχανικός|RIE|@mech|R23I14E35
+Πολιτικός μηχανικός|RIE|@civ|R37I14E35
+Μηχανικός παραγωγής (οργανώνει εργοστάσια)|ERI|@prod|E35R27I48
+Μηχανικός ενέργειας – φωτοβολταϊκά|RIE|@energy @mech|R27I24E34
+Μηχανικός πλοίου (Εμπορικό Ναυτικό)|RIE|sN eN|R25I45E03
+Πιλότος|RIE|sS sL|R47I45E03
+Μηχανικός περιβάλλοντος|IRE|@env|I24R37E35
+Καπετάνιος (πλοίαρχος)|ERI|sN eN|E03R47I45
+Αγρονόμος τοπογράφος|RIE|@topo|R34I18E35
+Μεταλλειολόγος (ορυχεία)|RIE|@mining|R57I24E37
+Αεροναυπηγός|IRE|@mech|I12R13E35
+Μηχανικός αυτοματισμών|IRE|@elec|I46R12E34
+Ηλεκτρονικός μηχανικός|IRE|@electronic @elec|I46R26E34
+Μηχανικός ασφάλειας στα εργοτάξια|REI|@civ @mech|R37E03I47
+Εργοταξιάρχης|REI|@civ|R37E05I14
+Αξιωματικός Μηχανικού (Στρατός)|REI|sS|R13E03I14
+Επιχειρηματίας τροφίμων|ERI|@agri @food|E79R18I23
+Μηχανικός αυτοκινήτων|RIE|@mech|R24I14E35
+Ελεγκτής εναέριας κυκλοφορίας|IRE|sL|I45R49E03
+Μηχανικός ρομποτικής|IRE|@elec @mech|I16R16E34
+Διευθυντής εργοστασίου|ERI|@prod @mech|E05R27I48
+Ενεργειακός σύμβουλος|EIR|@energy @mech|E16I48R37
+Μηχανικός πετρελαίου – φυσικού αερίου|RIE|@mining @chemeng|R27I24E37
+Συγκοινωνιολόγος (δρόμοι, τρένα)|RIE|@civ|R34I18E35
+Μηχανικός αεροσκαφών (συντήρηση)|RIE|k sL|R29I47E34
+Εργολάβος τεχνικών έργων|ERI|@civ|E29R37I14
+Μηχανικός ποιότητας|RIE|@prod @mech|R37I08E34
+Διευθυντής αγροκτήματος|ERI|@agri|E39R08I23
+Μηχανικός τηλεπικοινωνιών|IRE|@elec|I16R26E34
+Ιδρυτής τεχνολογικής startup|EIR|@ceid @mech|E47I06R01`,
+RIC:`Ηλεκτρολόγος μηχανικός|IRC|@elec|I14R23C17
+Χημικός μηχανικός|IRC|@chemeng|I12R79C17
+Τεχνολόγος τροφίμων|ICR|@food|I25C27R79
+Τεχνολόγος ιατρικών εργαστηρίων (εξετάσεις αίματος)|IRC|@biomed|I25R79C17
+Χημικός ποιοτικού ελέγχου|ICR|@chem|I25C17R79
+Τεχνικός δικτύων υπολογιστών|RCI|k eP|R02C25I46
+Τεχνικός διάγνωσης αυτοκινήτων|RIC|k eM|R02I46C29
+Ηλεκτρονικός (τεχνικός)|RIC|k eH|R26I46C17
+Τεχνικός υπολογιστών (IT support)|RCI|k eP|R26C25I46
+Τεχνικός χημικού εργαστηρίου|RCI|k|R79C17I25
+Χειριστής CNC (τόρνος – φρέζα)|RCI|k eM|R03C17I14
+Ψυκτικός|RIC|k eM|R27I24C27
+Μηχανικός υπολογιστών|ICR|@ceid @digsys|I46C15R26
+Μετεωρολόγος|IRC|@physics @geog|I18R59C49
+Γεωλόγος|IRC|@geo|I25R58C13
+Ενεργειακός επιθεωρητής κτιρίων|CIR|@mech @civ|C28I48R37
+Τεχνικός ηλεκτρονικών αεροσκαφών|RIC|k sL|R27I46C17
+Μηχανικός υλικών|IRC|@materials|I25R79C17
+Ειδικός κυβερνοασφάλειας|ICR|@ceid k|I46C12R02
+Τεχνικός φαρμακοβιομηχανίας|RCI|k|R79C27I25
+Φυσικός|IRC|@physics|I12R39C17
+Χημικός|IRC|@chem|I25R79C17
+Ηλεκτρολόγος μετρήσεων και ελέγχων|RCI|k eH|R39C17I14
+Τεχνικός αυτοματισμών|RIC|k eH|R12I46C27
+Τεχνικός ποιοτικού ελέγχου|CRI|k|C17R39I45
+Ελεγκτής ποιότητας νερού|CIR|k @chem|C17I25R79
+Προγραμματιστής μικροελεγκτών (Arduino)|IRC|@elec @ceid|I46R16C17
+Τεχνικός ανεμογεννητριών|RIC|k eH|R25I14C27
+Σεισμολόγος|IRC|@geo @physics|I18R59C49
+Τεχνικός οπτικών ινών (internet)|RCI|k eH|R06C17I45`,
+RAS:`Μάγειρας|RAS|k|R56A02S59
+Ζαχαροπλάστης|RAS|k|R16A02S79
+Κομμωτής/κομμώτρια|ARS|k eY|A27R06S07
+Αισθητικός (περιποίηση προσώπου)|SAR|@biomed k eY|S07A27R69
+Δάσκαλος χορού|ASR|sD|A45S23R56
+Ανθοπώλης – ανθοδιακοσμητής|ARS|k|A29R68S07
+Μακιγιέρ|ARS|k|A27R06S07
+Φούρναρης|RAS|k|R56A09S79
+Δάσκαλος ζωγραφικής σε εργαστήριο|ASR|@finearts|A12S23R69
+Εμψυχωτής εικαστικών εργαστηρίων|SAR|k|S23A01R69
+Γυμναστής αεροβικής – pilates|SRA|@pe|S03R56A45
+Ενδυματολόγος|ARS|k @fashion|A29R16S05
+Εικαστικός θεραπευτής|SAR|@finearts @psy|S16A01R69
+Μπαρίστα – μπάρμαν|RSA|k|R06S79A07
+Μανικιουρίστ|RAS|k|R16A27S79
+Μοδίστρα – ράφτης|RAS|k|R16A29S67
+Χορευτής|ARS|sD|A45R56S25
+Μηχανικός σκηνής (θέατρο)|RAS|k|R15A07S59
+Δάσκαλος παραδοσιακών τεχνών|SAR|k|S23A09R16
+Βιτρινίστας|ARS|k|A27R16S07
+Αγγειοπλάστης – δάσκαλος κεραμικής|RAS|k|R69A09S23
+Βοηθός σεφ ξενοδοχείου|RSA|k|R56S59A07
+Εκπαιδευτής ιππασίας|RSA|sL|R58S23A47
+Κηπουρός|RAS|k eG|R08A27S07
+Χειροποίητα κοσμήματα (κατασκευή)|ARS|k|A09R16S07
+Animator σε κατασκηνώσεις|SAR|k|S05A04R05
+Δάσκαλος μουσικοκινητικής αγωγής|SAR|@music sO|S23A45R56
+Μάγειρας σχολικών γευμάτων|RSA|k|R56S59A07
+Κουκλοπαίκτης (Καραγκιόζης, μαριονέτες)|ASR|sD k|A49S04R69
+Δάσκαλος μαγειρικής|SRA|k|S23R56A07`,
+RAE:`Διακοσμητής σπιτιών|AER|k @inter|A27E16R36
+Σχεδιαστής μόδας|AER|k @fashion|A08E14R16
+Επιπλοποιός|RAE|k eT|R16A79E49
+Οινολόγος|RAE|@wine|R89A07E39
+Σεφ – ιδιοκτήτης εστιατορίου|ERA|k|E09R56A07
+Σκηνογράφος|ARE|k @theatre|A01R13E45
+Αρχιτέκτονας με δικό του γραφείο|AER|@arch|A07E29R36
+Φωτογράφος γάμων και εκδηλώσεων|ARE|k|A27R04E69
+Παραγωγός τοπικών προϊόντων (μέλι, τυριά, γλυκά)|ERA|k eG|E69R68A09
+Αμπελουργός – κρασοπαραγωγός|REA|eG @agri @wine|R58E39A07
+Σχεδιαστής κήπων|ARE|k @agri|A02R38E69
+Ιδιοκτήτης κομμωτηρίου|EAR|k eY|E69A27R06
+Διοργανωτής συναυλιών|EAR|k|E57A05R05
+Σχεδιαστής παπουτσιών και τσαντών|AER|k|A08E69R16
+Μάστορας ανακαινίσεων|REA|k eD|R12E49A27
+Ζυθοποιός (μπύρα)|REA|k|R89E49A08
+Visual merchandiser (στήσιμο καταστημάτων)|AER|k|A27E16R16
+YouTuber – δημιουργός βίντεο|AER|k|A04E47R06
+Καραβομαραγκός|RAE|k|R16A79E49
+Ιδιοκτήτης αγροτουρισμού|ERA|k @tour|E79R08A07
+Ιδιοκτήτης εργαστηρίου κεραμικής|ERA|k|E69R69A09
+Τεχνικός στησίματος εκθέσεων|RAE|k|R15A27E35
+Κατασκευαστής σκαφών|REA|k|R13E39A79
+Κομμωτής θεάτρου και κινηματογράφου|ARE|k|A27R06E35
+Σχεδιαστής φωτισμού συναυλιών|ARE|k|A27R07E35
+Ιδιοκτήτης ζαχαροπλαστείου|ERA|k|E69R16A02
+Τατουατζής|ARE|sL|A12R69E69
+Σχεδιαστής εσωτερικών σκαφών (γιοτ)|AER|k @inter|A27E26R36
+Ιδιοκτήτης ανθοπωλείου|EAR|k|E69A29R68
+Λυράρης – κατασκευαστής παραδοσιακών οργάνων|RAE|k|R69A59E49`,
+RAC:`Γραφίστας προεκτύπωσης|ACR|k eT|A26C19R03
+Τυπογράφος (τεχνικός εκτυπώσεων)|RCA|k eT|R02C17A27
+Σχεδιαστής AutoCAD|RCA|k eD eM|R03C19A26
+Συντηρητής έργων τέχνης|RAC|@conserv|R69A79C19
+Κεραμίστας|ARC|k|A09R69C19
+Πατρονίστ (φτιάχνει πατρόν ρούχων)|RAC|k @fashion|R36A29C19
+Βιβλιοδέτης|RCA|k|R69C19A79
+Τεχνικός ψηφιακών εκτυπώσεων|RCA|k eT|R02C17A26
+Σχεδιαστής υφασμάτων|ARC|k @fashion|A26R69C19
+Retoucher (επεξεργασία φωτογραφίας)|ACR|k|A67C19R06
+Χαράκτης|ARC|k|A19R69C19
+Σχεδιαστής μηχανολογικών σχεδίων|RCA|k eM|R03C19A26
+Χαρτογράφος|CRA|@topo @geog|C19R03A26
+Τεχνικός ψηφιοποίησης αρχείων και έργων|CRA|k @culture|C35R69A27
+Μοντέρ (μοντάζ βίντεο)|ARC|k|A06R06C69
+Αγιογράφος|ARC|k|A12R69C19
+Τεχνίτης ψηφιδωτών|ARC|k|A29R69C19
+Τεχνικός σε βιοτεχνία ρούχων|RCA|k|R06C17A29
+Ωρολογοποιός|RCA|k|R26C19A79
+Σελιδοποιός|CAR|k eT|C19A26R06
+Σχεδιαστής αρχιτεκτονικών σχεδίων|RCA|k eD|R03C19A26
+Κατασκευαστής πρωτοτύπων (prototypes)|RAC|k|R16A89C17
+Ράφτης ρούχων στα μέτρα|RAC|k|R36A29C19
+Χρυσοχόος|RAC|k|R69A79C19
+Κορνιζάς – επιχρυσωτής|RAC|k|R69A79C17
+Χειριστής μηχανής κεντήματος|CRA|k|C17R06A26
+Αποκαταστάτης επίπλων|RAC|k|R26A79C19
+Ταπετσιέρης|RAC|k|R16A29C19
+Τεχνικός 3D εκτυπωτών|RCA|k|R02C17A68
+Καλλιγράφος|ARC|k|A12R69C19`,
+RSE:`Αξιωματικός Στρατού|ERS|sS|E03R57S58
+Πυροσβέστης|RSE|sA|R57S59E34
+Αστυνομικός|RSE|sA|R47S89E34
+Λιμενικός|RSE|sA|R47S79E34
+Γυμναστής – προπονητής|SRE|@pe|S35R56E04
+Καθηγητής ΕΠΑΛ (τεχνικά μαθήματα)|SRE|@aspete @mech|S23R02E58
+Δάσκαλος οδήγησης|SRE|sL|S29R47E38
+Αθλητικός μάνατζερ|ESR|@sportmgmt @bus|E25S05R05
+Υπεύθυνος ασφαλείας (security)|RES|k|R57E34S89
+Εκπαιδευτής ναυαγοσωστών|SRE|sL|S23R57E08
+Ορειβατικός οδηγός|RSE|sL|R57S59E37
+Διευθυντής γυμναστηρίου|ESR|@pe @sportmgmt|E05S05R56
+Προϊστάμενος βάρδιας σε εργοστάσιο|ERS|k eM|E05R07S58
+Εκπαιδευτής ενηλίκων (επαγγελματική κατάρτιση)|SER|@aspete|S23E58R02
+Δημοτικός αστυνομικός|SER|sP|S79E34R45
+Δασοφύλακας|RSE|@forest sP|R58S79E34
+Επαγγελματίας αθλητής|RSE|sL|R56S25E47
+Οργανωτής αθλητικών αγώνων|ESR|k|E57S05R05
+Υπεύθυνος καταστήματος|ESR|k eO|E56S79R05
+Εκπαιδευτής ασφάλειας εργασίας|SRE|k|S03R57E58
+Αξιωματικός Πυροσβεστικής|ERS|sA|E03R57S58
+Αξιωματικός Αστυνομίας|ESR|sA|E03S58R45
+Υπαξιωματικός (μόνιμος στρατιωτικός)|RSE|sS|R57S59E34
+Προπονητής ποδοσφαίρου|SER|@pe sL|S35E03R56
+Δάσκαλος καταδύσεων|RSE|sL|R57S23E37
+Αρχηγός κατασκήνωσης|SER|k|S25E05R58
+Οδηγός rafting και δραστηριοτήτων περιπέτειας|RES|k sL|R57E47S09
+Επόπτης δημόσιων έργων|ERS|@civ|E03R37S08
+Ιδιοκτήτης γυμναστηρίου|ESR|@pe k|E79S05R56
+Σωφρονιστικός υπάλληλος|RSE|sP|R57S89E03`,
+RSC:`Νοσηλευτής|SRC|@nurse|S14R79C19
+Μαία|SRC|@midwife|S14R69C12
+Βοηθός νοσηλευτή|SRC|k eY|S49R59C26
+Βοηθός φαρμακοποιού|CRS|k eY|C13R09S79
+Τεχνικός ασφάλειας εργασίας|RCS|k|R37C28S03
+Υγειονομικός επόπτης|CRS|@biomed|C28R57S08
+Βοηθός βρεφονηπιοκόμου|SRC|k eY|S24R57C06
+Βοηθός ακτινολογικού εργαστηρίου|RCS|k eY|R79C12S49
+Τραυματιοφορέας|RSC|k|R57S49C26
+Οδηγός φορτηγού – λεωφορείου|RCS|sL|R45C26S79
+Φροντιστής ηλικιωμένων|SRC|k|S24R57C06
+Νοσηλευτής κατ' οίκον|SRC|@nurse|S14R49C36
+Τεχνικός απολυμάνσεων|RCS|k|R07C12S79
+Βοηθός μικροβιολογικού εργαστηρίου|RCS|k eY|R79C19S09
+Φροντιστής ΑμεΑ|SRC|k|S24R57C06
+Τεχνικός αποστείρωσης (νοσοκομείο)|RCS|k|R79C12S59
+Σχολικός νοσηλευτής|SRC|@nurse|S13R79C36
+Μάγειρας νοσοκομείου|RSC|k|R56S59C12
+Υπεύθυνος υγιεινής τροφίμων|CRS|k eG|C28R79S03
+Νοσηλευτής ψυχικής υγείας|SRC|@nurse|S16R79C12
+Οδηγός σχολικού λεωφορείου|RSC|sL|R45S29C26
+Κούριερ – διανομέας|RCS|sP|R45C06S79
+Επιστάτης σχολείου|RCS|sP|R27C06S79
+Αεροσυνοδός|SRC|sL|S79R57C26
+Βοηθός διαιτολόγου|SCR|k|S03C14R79
+Τεχνικός σε κατάστημα οπτικών|RCS|k|R69C19S07
+Ναύτης|RCS|sN eN|R57C26S59
+Εργαζόμενος σε καταφύγιο ζώων|RSC|k|R58S24C06
+Βοηθός εργοθεραπευτή|SRC|k|S24R06C06
+Συνοδός ΑμεΑ στις μεταφορές|SRC|k|S49R45C26`,
+REC:`Εργοδηγός οικοδομών|REC|k eD|R37E05C26
+Ηλεκτρολόγος|RCE|eH k|R27C29E49
+Τεχνικός καλοριφέρ και κλιματιστικών|RCE|eM k|R27C29E49
+Ιδιοκτήτης συνεργείου αυτοκινήτων|ERC|eM k|E69R02C46
+Αποθηκάριος – υπεύθυνος logistics|CER|k @logist|C03E35R45
+Πωλητής μηχανημάτων|ERC|k|E16R02C49
+Αγρότης|REC|eG @agri|R58E39C46
+Υδραυλικός|RCE|eM k|R27C29E49
+Οικοδόμος – εργολάβος|ERC|k eD|E59R13C46
+Τεχνικός φωτοβολταϊκών|RCE|eH k|R17C27E49
+Επιχειρηματίας κλιματισμού|ERC|eM k|E69R27C46
+Φορτηγατζής (με δικό του φορτηγό)|ERC|sL|E79R45C69
+Έμπορος οικοδομικών υλικών|ECR|k eO|E69C45R05
+Κτηνοτρόφος|REC|eG|R58E39C46
+Τεχνικός ασανσέρ|RCE|k eH|R27C27E49
+Μελισσοκόμος|REC|k eG|R68E49C69
+Επιστάτης εργοστασίου|REC|k eM|R07E05C26
+Πωλητής αγροτικών εφοδίων|ERC|k eG|E16R08C46
+Πραγματογνώμονας αυτοκινήτων|CRE|k|C19R24E23
+Τεχνικός φυσικού αερίου|RCE|eM k|R27C27E49
+Ψαράς (με δικό του καΐκι)|REC|sL|R45E79C46
+Ηλεκτρολόγος πλοίων|RCE|sN k|R27C27E49
+Χειριστής μπουλντόζας – εκσκαφέα|RCE|sL|R47C27E49
+Υπεύθυνος στόλου οχημάτων|ECR|k|E35C06R24
+Συντηρητής ξενοδοχείου|RCE|k eM|R27C69E49
+Έμπορος ανταλλακτικών αυτοκινήτων|ECR|k eM|E69C34R24
+Αλουμινάς – σιδεράς|RCE|eM k|R16C19E49
+Ηλεκτροσυγκολλητής|RCE|k eM|R07C17E49
+Τεχνικός τρακτέρ και γεωργικών μηχανημάτων|RCE|k eM|R28C27E49
+Μηχανοδηγός τρένου|RCE|sL|R47C26E39`,
+IAS:`Ψυχολόγος|SIA|@psy|S16I37A34
+Λογοθεραπευτής|SIA|@speech|S26I45A45
+Αρχαιολόγος|IAS|@hist|I35A79S05
+Ψυχίατρος|ISA|@med|I47S16A34
+Φιλόλογος|SAI|@phil|S03A34I79
+Κοινωνιολόγος|ISA|@socio|I38S06A38
+Μουσικοθεραπευτής|SAI|@music sO|S16A45I57
+Ιστορικός|IAS|@hist|I37A38S03
+Ανθρωπολόγος|IAS|@anthro|I35A38S06
+Σχολικός ψυχολόγος|SIA|@psy|S36I47A34
+Εκπαιδευτικός ειδικής αγωγής|SIA|@special|S23I45A04
+Παιδοψυχίατρος|ISA|@med|I47S12A04
+Συγγραφέας|AIS|@phil|A38I37S16
+Θεολόγος|SIA|@theol|S03I37A34
+Καθηγητής φιλοσοφίας|ISA|@philo|I37S03A38
+Μουσειοπαιδαγωγός|SAI|@hist|S03A04I35
+Γλωσσολόγος|IAS|@phil @lang|I37A38S06
+Εθνομουσικολόγος (μελετά την παραδοσιακή μουσική)|IAS|@music @hist|I35A35S06
+Δραματοθεραπευτής|SAI|@theatre sD|S16A04I57
+Λαογράφος|IAS|@hist|I35A38S06
+Ψυχοθεραπευτής|SIA|@psy|S16I47A34
+Βυζαντινολόγος|IAS|@hist|I37A79S03
+Κλασικός φιλόλογος|IAS|@phil|I37A38S03
+Παιδοψυχολόγος|SIA|@psy|S12I45A04
+Αρχαιολόγος σε εφορεία αρχαιοτήτων|IAS|@hist sP|I35A79S05
+Νευροψυχολόγος|ISA|@psy|I45S16A34
+Ιστορικός τέχνης|AIS|@hist|A37I37S03
+Σύμβουλος ψυχικής υγείας εφήβων|SIA|@psy @social|S16I47A04
+Δάσκαλος δημιουργικής γραφής|ASI|@phil|A38S03I37
+Φιλόσοφος – ερευνητής|IAS|@philo|I37A38S06`,
+IAE:`Πολεοδόμος|AIE|@plan @arch|A02I38E35
+Ερευνητής δημοσιογράφος|IAE|@media|I37A34E14
+UX designer (σχεδιάζει εφαρμογές για τον χρήστη)|AIE|@ceid @design k|A06I34E14
+Στρατηγικός σύμβουλος διαφήμισης|EAI|@mkt @media|E14A08I38
+Σκηνοθέτης ντοκιμαντέρ|AIE|@film|A03I35E05
+Σύμβουλος καινοτομίας|EIA|@bus|E47I37A08
+Ιδρυτής startup|EIA|@bus @ceid|E47I07A08
+Επιμελητής εκθέσεων (curator)|AIE|@hist @finearts|A37I35E58
+Developer εφαρμογών κινητού|IAE|@ceid k|I46A06E47
+Κριτικός τέχνης|AIE|@hist @phil|A37I37E18
+Σεναριογράφος|AIE|@film @theatre|A38I37E14
+Σύμβουλος brand (εταιρικής εικόνας)|AEI|@mkt @graphic|A26E12I38
+Αρχιτέκτονας εκθεσιακών χώρων|AIE|@arch|A02I34E35
+Παραγωγός podcast|AEI|k|A34E45I35
+Δημοσιογράφος επιστήμης|IAE|@media @bio|I39A34E18
+Ερευνητής αγοράς|IEA|@mkt @stats|I38E13A08
+Δικηγόρος πνευματικών δικαιωμάτων|IEA|@law|I37E12A38
+Σχεδιαστής εκπαιδευτικών εφαρμογών|IAE|@ceid|I46A06E45
+Αρχισυντάκτης περιοδικού|EAI|@media|E03A37I37
+Πολιτιστικός διαχειριστής|EAI|@culture @hist|E59A07I38
+Αρχιτέκτονας αναστηλώσεων|IAE|@arch|I35A07E35
+Service designer (σχεδιάζει υπηρεσίες)|AIE|@design @bus|A08I47E15
+Αναλυτής τάσεων μόδας|AEI|@fashion @mkt|A78E16I38
+Μουσικός παραγωγός|AEI|@musictech @music|A56E45I46
+Σύμβουλος πατεντών|IEA|@law @mech|I37E12A08
+Σχεδιαστής εμπειρίας μουσείων|AIE|@culture|A07I35E58
+Data journalist (δημοσιογράφος δεδομένων)|IAE|@media @stats|I68A34E18
+Σύμβουλος βιώσιμων πόλεων|IAE|@plan|I38A08E18
+Creative director ψηφιακού studio|EAI|@graphic k|E05A07I46
+Ερευνητής νευρομάρκετινγκ|IEA|@psy @mkt|I38E16A08`,
+IAC:`Game developer (προγραμματιστής παιχνιδιών)|ICA|@ceid k|I46C19A08
+Επιμελητής εκδόσεων|CAI|@phil|C19A37I37
+Μεταφραστής|ACI|@transl @lang|A37C19I39
+Βιβλιοθηκονόμος|CIA|@lib|C03I39A37
+Αναλυτής GIS (ψηφιακοί χάρτες)|ICA|@geog @topo|I68C15A26
+Μουσειολόγος|IAC|@hist @culture|I35A79C03
+Τεχνικός συντάκτης (εγχειρίδια οδηγιών)|CAI|@phil @ceid|C19A37I37
+Σχεδιαστής βάσεων δεδομένων|ICA|@ceid|I68C03A08
+Αρχειονόμος|CIA|@lib|C03I35A79
+Σχεδιαστής γραφημάτων δεδομένων|AIC|@stats @graphic|A26I68C19
+Υποτιτλιστής|ACI|k|A37C69I39
+Διορθωτής κειμένων|CAI|@phil k|C19A37I79
+Λεξικογράφος|IAC|@phil|I37A37C03
+Ερευνητής ψηφιακών ανθρωπιστικών σπουδών|IAC|@hist|I36A37C35
+Παλαιογράφος|ICA|@phil @hist|I35C19A79
+Αναλυτής πληροφοριακών συστημάτων|ICA|@ceid|I48C05A08
+Web developer (κατασκευή ιστοσελίδων)|ICA|@ceid k eP|I46C19A26
+Εικονογράφος χαρτών|ACI|k @geog|A12C19I35
+Τεχνικός μεταγλώττισης|ACI|k|A45C69I39
+Ερευνητής γλωσσικής τεχνητής νοημοσύνης|IAC|@ceid @phil|I68A38C19
+Σχεδιαστής γραμματοσειρών|ACI|k @graphic|A16C19I56
+Τεκμηριωτής μουσείου|CIA|@hist @lib|C03I35A79
+Προγραμματιστής γραφικών|ICA|@ceid|I16C19A26
+Επιγραφολόγος|IAC|@hist|I35A79C19
+Μουσικολόγος|IAC|@music|I37A57C03
+Εικονογράφος επιστημονικών βιβλίων|AIC|k @finearts|A12I25C19
+e-learning developer (ψηφιακά μαθήματα)|ICA|k @ceid|I46C05A06
+Μεταφραστής λογοτεχνίας|AIC|@transl @phil|A38I37C19
+Infographics designer|AIC|k @graphic|A26I38C19
+Γενεαλόγος – ερευνητής αρχείων|CIA|@hist @lib|C39I35A37`,
+ISE:`Γιατρός|ISE|@med|I24S06E03
+Οικογενειακός γιατρός|SIE|@med|S16I24E03
+Φαρμακοποιός (με δικό του φαρμακείο)|ESI|@pharm|E69S07I29
+Δικηγόρος|ESI|@law|E12S06I37
+Οικονομολόγος – σύμβουλος|EIS|@econ|E13I18S06
+Πολιτικός επιστήμονας|ISE|@pol|I37S05E18
+Σύμβουλος επαγγελματικού προσανατολισμού|SIE|@psy @prim|S36I35E15
+Διπλωμάτης|ESI|@intl @law sP|E28S09I37
+Διευθυντής νοσοκομείου|ESI|@pubadm @bus|E03S58I38
+Ειδικός δημόσιας υγείας|ISE|@med @nurse|I38S03E58
+Δικαστής|ISE|@law sP|I37S69E03
+Συμβολαιογράφος|EIS|@law sP|E23I37S06
+Σύμβουλος περιφερειακής ανάπτυξης|EIS|@regdev @econ|E35I38S05
+Καθηγητής οικονομικών|SIE|@econ|S03I18E58
+Οργανωσιακός ψυχολόγος|ISE|@psy|I38S06E15
+Στρατιωτικός γιατρός|SIE|sS|S49I24E03
+Στέλεχος ανθρωπιστικής οργάνωσης|SEI|@intl @social|S15E05I37
+Σύμβουλος ευρωπαϊκών προγραμμάτων|ESI|@intl @econ|E59S05I38
+Εγκληματολόγος|ISE|@law @socio|I37S06E38
+Σχολικός σύμβουλος|SIE|@prim|S03I37E05
+Ιατροδικαστής|ISE|@med|I45S69E38
+Νευρολόγος|ISE|@med|I24S16E03
+Παιδίατρος|SIE|@med|S12I24E03
+Καθηγητής πανεπιστημίου|ISE|@physics @hist @econ @med|I39S03E58
+Σύμβουλος δημόσιας πολιτικής|EIS|@pol @econ|E13I38S05
+Επιθεωρητής εργασίας|IES|@law @econ sP|I37E38S08
+Οικονομολόγος υγείας|IES|@econ|I18E35S05
+Δικηγόρος ανθρωπίνων δικαιωμάτων|SEI|@law|S16E18I37
+Σύμβουλος επιχειρήσεων|EIS|@bus @econ|E13I08S05
+Αναισθησιολόγος|ISE|@med|I24S29E03`,
+ISC:`Διαιτολόγος|ISC|@diet|I25S06C19
+Βιολόγος|ICS|@bio|I25C17S05
+Καθηγητής φυσικής – χημείας|SIC|@physics @chem|S03I12C06
+Επισκέπτης υγείας|SIC|@nurse|S01I45C36
+Επιδημιολόγος|ICS|@med @stats|I18C14S05
+Κοινωνικός ερευνητής|ICS|@socio|I38C34S06
+Βιοχημικός|ICS|@bio @chem|I25C17S05
+Ιατρικός φυσικός ακτινοθεραπείας|ICS|@physics|I12C17S49
+Γενετικός σύμβουλος|SIC|@bio @med|S16I25C19
+Φαρμακοποιός νοσοκομείου|ICS|@pharm|I29C12S05
+Καθηγητής πληροφορικής|SIC|@ceid|S03I46C05
+Ερευνητής εκπαίδευσης|ISC|@prim @psy|I38S36C34
+Βιοστατιστικός|CIS|@stats|C45I18S05
+Μοριακός βιολόγος|ICS|@bio|I25C17S05
+Ελεγκτής ιατρικών πράξεων (ΕΟΠΥΥ)|CIS|@med @nurse|C38I47S06
+Υπεύθυνος ποιότητας νοσοκομείου|CIS|@nurse @bus|C27I48S05
+Ερευνητής κλινικών μελετών|ICS|@med @pharm|I38C13S06
+Περιβαλλοντικός εκπαιδευτής|SIC|@envsci @bio|S03I25C06
+Μικροβιολόγος|ICS|@bio @biomed|I25C17S05
+Αναλυτής δεδομένων υγείας|CIS|@stats @ceid|C45I68S05
+Καθηγητής μαθηματικών|SIC|@math|S03I17C14
+Νοσηλευτής ερευνητής|ISC|@nurse|I39S14C17
+Ειδικός φαρμακοεπαγρύπνησης (ασφάλεια φαρμάκων)|CIS|@pharm|C38I37S06
+Ψυχομέτρης (ειδικός στα ψυχολογικά τεστ)|ICS|@psy|I18C14S06
+Βιβλιοθηκονόμος ιατρικής βιβλιοθήκης|CSI|@lib|C03S07I39
+Κοινωνικός λειτουργός|SCI|@social|S16C38I47
+Ειδικός ασφάλειας τροφίμων|ICS|@food|I25C28S03
+Καθηγητής βιολογίας|SIC|@bio|S03I25C06
+Δημογράφος|ICS|@stats @socio|I18C34S05
+Υγειονομικός επόπτης σχολείων|CSI|@biomed|C28S03I45`,
+IEC:`Οικονομολόγος|IEC|@econ|I18E13C45
+Αναλογιστής|ICE|@stats @math|I18C14E37
+Αναλυτής δεδομένων|ICE|@stats @ceid|I68C45E13
+Προγραμματιστής (software engineer)|ICE|@ceid|I46C19E45
+Ορκωτός ελεγκτής|CEI|@acc sP|C48E23I07
+Στατιστικός|ICE|@stats|I18C14E13
+Χρηματοοικονομικός αναλυτής|IEC|@finance @econ|I18E37C45
+Αναλυτής πιστωτικού κινδύνου (τράπεζα)|ICE|@finance @stats|I78C48E37
+Αναλυτής επενδύσεων|EIC|@finance @econ|E37I18C45
+Εφοριακός|CIE|@acc sP|C48I07E23
+Λογιστής – φοροτέχνης|CEI|@acc k eO|C48E29I01
+Data scientist (επιστήμονας δεδομένων)|ICE|@stats @ceid|I68C45E13
+Αναλυτής BI (επιχειρηματικής ευφυΐας)|IEC|@ceid @bus|I68E13C45
+Software tester (έλεγχος λογισμικού)|CIE|@ceid|C79I46E34
+Οικονομικός διευθυντής|ECI|@acc @finance|E03C48I18
+Ελεγκτής κυβερνοασφάλειας|ICE|@ceid|I46C27E34
+Αναλυτής εφοδιαστικής αλυσίδας|IEC|@logist @bus|I48E35C06
+Ποσοτικός αναλυτής (quant)|ICE|@math @stats|I16C45E37
+Ερευνητής Τράπεζας της Ελλάδος|IEC|@econ|I38E13C45
+Σύμβουλος ERP (λογισμικό επιχειρήσεων)|ECI|@ceid @bus|E26C35I46
+Οικονομέτρης|ICE|@econ @stats|I18C45E13
+Διαχειριστής χαρτοφυλακίου|EIC|@finance|E37I18C45
+Αναλυτής αγοράς ενέργειας|ICE|@econ @energy|I18C45E37
+Μηχανικός τεχνητής νοημοσύνης|ICE|@ceid|I16C19E47
+Εσωτερικός ελεγκτής|CIE|@acc|C28I07E23
+Product manager (υπεύθυνος ψηφιακού προϊόντος)|EIC|@bus @ceid|E05I48C69
+Αναλυτής ασφαλίσεων|ICE|@stats @finance|I18C48E23
+Ναυτιλιακός αναλυτής|EIC|@ship @econ|E37I18C45
+Επιχειρηματίας fintech|EIC|@finance @ceid|E47I06C45
+Στέλεχος ΕΛΣΤΑΤ|CIE|@stats sP|C45I18E35`,
+ASE:`Ηθοποιός|ASE|sD|A04S05E48
+Δημοσιογράφος|AES|@media k|A34E18S06
+Υπεύθυνος δημοσίων σχέσεων|ESA|@media @mkt k|E18S05A34
+Παρουσιαστής ραδιοφώνου – τηλεόρασης|ESA|k|E48S09A04
+Ξεναγός|SEA|sX|S03E58A34
+Θεατροπαιδαγωγός|SAE|@theatre sD|S23A04E05
+Σκηνοθέτης θεάτρου|AES|sD @theatre|A04E05S05
+Τραγουδιστής – μουσικός|ASE|sO @music|A45S05E48
+Content creator (δημιουργός περιεχομένου)|AES|k|A34E47S06
+Υπεύθυνος επικοινωνίας δήμου|ESA|@media @pubadm|E18S07A34
+Στέλεχος τουριστικού marketing|ESA|@tour @mkt|E16S07A08
+Animator ξενοδοχείου|SAE|k|S07A45E48
+Ραδιοφωνικός παραγωγός|AES|k|A35E45S06
+Παρουσιαστής εκδηλώσεων|EAS|k|E48A04S09
+Καθηγητής ξένων γλωσσών|SAE|@lang|S23A34E58
+Διευθυντής πολιτιστικού κέντρου|EAS|@culture|E05A07S05
+Χορογράφος|ASE|sD|A45S35E05
+Εκπρόσωπος τύπου|ESA|@media @pol|E18S09A34
+Συντονιστής εθελοντών|SEA|k|S05E05A04
+Δάσκαλος ρητορικής – δημόσιου λόγου|SAE|@phil|S03A34E18
+Κωμικός (stand-up)|AES|sD|A48E78S06
+Συντονιστής ανταλλαγών νέων (Erasmus+)|SEA|@intl @socio|S05E45A08
+Social media manager εταιρείας|AES|k @mkt|A36E16S06
+Υπεύθυνος εμπειρίας επισκεπτών μουσείου|SAE|@culture|S07A07E58
+Ρεπόρτερ τηλεόρασης|AES|@media k|A34E48S06
+Σύμβουλος πολιτικής επικοινωνίας|EAS|@pol @media|E18A38S06
+Ξεναγός κρασιού (οινοτουρισμός)|SEA|sX @wine|S07E68A47
+Παραγωγός θεάτρου|EAS|sD k|E59A07S05
+Οργανωτής εκδηλώσεων βιβλίου|EAS|k|E59A37S07
+Δάσκαλος θεατρικού παιχνιδιού|SAE|k|S23A04E05`,
+ASC:`Νηπιαγωγός|SAC|@pre|S23A04C06
+Καθηγητής μουσικής|SAC|@music sO|S23A45C06
+Μεταφραστής – διερμηνέας|ACS|@transl|A34C19S06
+Σχολικός βιβλιοθηκονόμος|CSA|@lib|C03S37A37
+Εμψυχωτής παιδικών εργαστηρίων|SAC|k|S23A01C06
+Βοηθός νηπιαγωγού|SCA|k eY|S24C26A04
+Δάσκαλος|SAC|@prim|S23A04C06
+Καθηγητής καλλιτεχνικών|ASC|@finearts|A12S23C06
+Καθηγητής ωδείου|ASC|sO|A45S23C06
+Βρεφονηπιοκόμος|SCA|@early k eY|S24C26A04
+Υπεύθυνος εκπαιδευτικών προγραμμάτων μουσείου|SAC|@hist @culture|S03A04C05
+Επιμελητής παιδικών βιβλίων|ACS|@phil|A37C19S03
+Συγγραφέας σχολικών βιβλίων|ASC|@phil @prim|A38S03C19
+Διερμηνέας νοηματικής γλώσσας|SCA|@special k|S06C19A34
+Καθηγητής Αγγλικών (φροντιστήριο)|SAC|@lang|S23A34C06
+Εκπαιδευτής ζωγραφικής σε ΚΔΑΠ|SAC|k|S23A12C06
+Βιβλιοπώλης|CSA|k|C03S07A37
+Γραμματέας ωδείου|CSA|k|C35S79A57
+Εικονογράφος παιδικών βιβλίων|ACS|k @graphic @finearts|A12C69S01
+Δάσκαλος χορού σε σχολεία|SAC|@pe sD|S23A45C06
+Ψάλτης|ASC|sO|A35S05C26
+Συγγραφέας παιδικών βιβλίων|ASC|@phil @pre|A38S12C69
+Σχεδιαστής εκπαιδευτικών παιχνιδιών|ACS|k|A08C19S35
+Εκπαιδευτικός ειδικής αγωγής μέσα από τις τέχνες|SAC|@special|S12A04C06
+Δάσκαλος σχολικού ραδιοφώνου – εφημερίδας|SAC|@prim @media|S35A34C06
+Υπεύθυνος παιδικής βιβλιοθήκης|CSA|@lib|C03S23A37
+Μεταφραστής παιδικής λογοτεχνίας|ACS|@transl|A38C19S06
+Δάσκαλος πιάνου|ASC|sO|A45S23C06
+Κειμενογράφος εκπαιδευτικών βίντεο|ACS|k|A36C69S03
+Καθηγητής Ελληνικών για ξένους|SAC|@phil|S23A34C06`,
+AEC:`Γραφίστας|ACE|@graphic k eT|A26C69E45
+Στέλεχος ψηφιακού marketing|EAC|@mkt k|E16A08C58
+Web designer (σχεδιαστής ιστοσελίδων)|ACE|k eP|A67C19E45
+Οργανωτής εκδηλώσεων|ECA|k|E59C06A07
+Παραγωγός βίντεο|EAC|k @film|E59A06C69
+Εκδότης βιβλίων|ECA|@phil @bus|E39C34A37
+Art director διαφήμισης|AEC|@graphic k|A27E05C69
+Copywriter (κειμενογράφος διαφημίσεων)|AEC|@media k|A38E16C69
+Social media manager|EAC|k|E16A36C69
+Σχεδιαστής συσκευασιών|ACE|k eT|A26C17E69
+Υπεύθυνος e-shop|ECA|k @bus|E69C35A67
+Φωτογράφος διαφήμισης|AEC|k|A27E16C69
+Υπεύθυνος γκαλερί|EAC|@finearts @culture|E16A37C03
+Μάνατζερ καλλιτεχνών|EAC|k|E12A57C69
+Σχεδιαστής λογοτύπων (branding)|ACE|@graphic k|A28C19E16
+Promoter μουσικής|EAC|k|E16A57C69
+Content editor (επιμελητής ψηφιακού περιεχομένου)|ACE|k|A36C19E49
+Παραγωγός διαφημιστικών σποτ|EAC|k @film|E59A06C69
+Υπεύθυνος βιτρινών αλυσίδας καταστημάτων|ECA|k|E56C07A27
+Σχεδιαστής εκθεσιακών περιπτέρων|AEC|k @inter|A26E59C69
+Motion designer (κινούμενα γραφικά)|ACE|k|A06C69E45
+Ιδιοκτήτης τυπογραφείου|ECA|k eT|E69C47A26
+Υπεύθυνος παραγωγής περιοδικού|CEA|@media|C69E05A27
+Επιμελητής καταλόγων προϊόντων|CAE|k|C19A26E69
+Brand manager μόδας|EAC|k @fashion @mkt|E16A27C69
+Υπεύθυνος δημοπρασιών τέχνης|ECA|@hist @bus|E26C38A37
+UI designer (σχεδιάζει οθόνες εφαρμογών)|ACE|k @ceid|A67C19E45
+Wedding planner (οργανωτής γάμων)|EAC|k|E59A27C69
+Συντονιστής τηλεοπτικής παραγωγής|CEA|k @film|C69E05A07
+Υπεύθυνος πνευματικών δικαιωμάτων μουσικής|CEA|@law k|C38E26A57`,
+SEC:`Διευθυντής ξενοδοχείου|ESC|@tour k|E05S79C06
+Υπεύθυνος προσωπικού (HR)|SEC|@bus @psy|S06E23C38
+Τραπεζικός υπάλληλος|CES|@finance @econ|C45E69S07
+Ασφαλιστής|ESC|k|E16S07C45
+Υπάλληλος ταξιδιωτικού γραφείου|SCE|k eO|S79C56E69
+Δημόσιος υπάλληλος|CSE|@pubadm sP|C25S79E39
+Γραμματέας ιατρείου|CSE|k eO|C35S79E59
+Ρεσεψιονίστ ξενοδοχείου|SCE|k eO|S79C56E69
+Υπάλληλος εξυπηρέτησης πελατών (call center)|SEC|k|S79C56E28
+Λογιστής|CES|@acc k eO|C45E39S07
+Γραμματέας σχολείου|CSE|@pubadm sP|C35S79E59
+Γραμματέας γραφείου|CSE|k eO|C35S79E59
+Υπάλληλος ΚΕΠ|CSE|sP|C28S79E35
+Μεσίτης ακινήτων|ESC|k sL|E26S07C48
+Διευθυντής καταστήματος|ESC|k @bus|E05S79C46
+Συντονιστής Erasmus+ και ευρωπαϊκών προγραμμάτων|ESC|@intl @bus|E59S05C36
+Εργασιακός σύμβουλος ΔΥΠΑ|SEC|@psy @social sP|S06E15C38
+Εκτελωνιστής|CES|k sL|C28E23S07
+Διοικητικός υπάλληλος νοσοκομείου|CSE|@pubadm @nurse|C35S79E35
+Υπάλληλος αεροδρομίου (check-in)|SCE|k|S79C56E28
+Σύμβουλος πελατών τράπεζας|SEC|@finance @bus|S07E16C45
+Υπεύθυνος μισθοδοσίας|CSE|@acc k|C48S06E35
+Βοηθός διευθυντή (personal assistant)|CSE|k|C06S79E35
+Υπεύθυνος κρατήσεων ξενοδοχείου|CSE|@tour k|C35S79E69
+Ιδιοκτήτης ταξιδιωτικού πρακτορείου|ESC|@tour k|E69S07C45
+Πράκτορας ακτοπλοΐας (εισιτήρια)|SCE|k eN|S79C56E69
+Στέλεχος αγροτικού συνεταιρισμού|ECS|@agri @bus|E05C45S05
+Υπεύθυνος κοινωνικών προγραμμάτων δήμου|SCE|@social @pubadm|S15C36E59
+Δικαστικός υπάλληλος|CSE|@law sP|C28S79E35
+Διοικητικό στέλεχος ΜΚΟ|SEC|@social @bus|S05E59C36`
+};
+
+/* Τμήματα ΑΕΙ ανά αντικείμενο — πηγή: Μηχανογραφικό Δελτίο ΓΕΛ 90% 2026 (ΥΠΑΙΘΑ). Μορφή: Ίδρυμα · Πόλη */
+const DEPT={
+arch:{n:"Αρχιτεκτόνων Μηχανικών",f:"2",sp:"Ελεύθερο & Γραμμικό Σχέδιο",l:"ΕΜΠ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Θεσσαλίας·Βόλος;ΔΠΘ·Ξάνθη;Παν. Ιωαννίνων·Ιωάννινα;Πολυτεχνείο Κρήτης·Χανιά"},
+inter:{n:"Εσωτερικής Αρχιτεκτονικής",f:"2",sp:"Ελεύθερο & Γραμμικό Σχέδιο",l:"ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Σέρρες"},
+topo:{n:"Τοπογραφίας & Γεωπληροφορικής / Αγρονόμων Τοπογράφων",f:"2",l:"ΕΜΠ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Σέρρες"},
+plan:{n:"Χωροταξίας & Πολεοδομίας",f:"2",l:"ΑΠΘ·Θεσσαλονίκη;Παν. Θεσσαλίας·Βόλος"},
+civ:{n:"Πολιτικών Μηχανικών",f:"2",l:"ΕΜΠ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Θεσσαλίας·Βόλος;ΔΠΘ·Ξάνθη;ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Σέρρες;Παν. Πελοποννήσου·Πάτρα"},
+mech:{n:"Μηχανολόγων Μηχανικών",f:"2",l:"ΕΜΠ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών (& Αεροναυπηγών)·Πάτρα;Παν. Θεσσαλίας·Βόλος;Παν. Δυτ. Μακεδονίας·Κοζάνη;ΠαΔΑ·Αιγάλεω;ΕΛΜΕΠΑ·Ηράκλειο;Παν. Πελοποννήσου·Πάτρα;ΔΙΠΑΕ·Σέρρες"},
+naval:{n:"Ναυπηγών Μηχανικών",f:"2",l:"ΕΜΠ·Αθήνα;ΠαΔΑ·Αιγάλεω"},
+elec:{n:"Ηλεκτρολόγων Μηχανικών & Μηχανικών Υπολογιστών",f:"2",l:"ΕΜΠ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Θεσσαλίας·Βόλος;ΔΠΘ·Ξάνθη;Παν. Δυτ. Μακεδονίας·Κοζάνη;Πολυτεχνείο Κρήτης·Χανιά;ΕΛΜΕΠΑ·Ηράκλειο;Παν. Πελοποννήσου·Πάτρα;ΠαΔΑ·Αιγάλεω"},
+electronic:{n:"Ηλεκτρονικών Μηχανικών / Ηλεκτρονικών Συστημάτων",f:"2",l:"ΕΛΜΕΠΑ·Χανιά;ΔΙΠΑΕ·Θεσσαλονίκη"},
+ceid:{n:"Πληροφορικής / Μηχανικών Υπολογιστών",f:"2,4",l:"ΕΚΠΑ·Αθήνα;ΟΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Ιωαννίνων·Ιωάννινα;Παν. Κρήτης·Ηράκλειο;Παν. Πειραιά·Πειραιάς;Παν. Μακεδονίας·Θεσσαλονίκη;ΔΠΘ·Καβάλα;Ιόνιο Παν.·Κέρκυρα;Παν. Δυτ. Μακεδονίας·Καστοριά;Χαροκόπειο·Αθήνα;ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Σέρρες;Παν. Πελοποννήσου·Τρίπολη;Παν. Θεσσαλίας·Λαμία;Παν. Αιγαίου·Σάμος;Παν. Ιωαννίνων·Άρτα"},
+digsys:{n:"Ψηφιακών Συστημάτων",f:"2,4",l:"Παν. Πειραιά·Πειραιάς;Παν. Θεσσαλίας·Λάρισα;Παν. Πελοποννήσου·Σπάρτη"},
+chemeng:{n:"Χημικών Μηχανικών",f:"2",l:"ΕΜΠ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Δυτ. Μακεδονίας·Κοζάνη;Πολυτεχνείο Κρήτης·Χανιά"},
+mining:{n:"Μεταλλειολόγων / Μηχανικών Ορυκτών Πόρων",f:"2",l:"ΕΜΠ·Αθήνα;Πολυτεχνείο Κρήτης·Χανιά;Παν. Δυτ. Μακεδονίας·Κοζάνη"},
+prod:{n:"Μηχανικών Παραγωγής & Διοίκησης",f:"2",l:"ΔΠΘ·Ξάνθη;Πολυτεχνείο Κρήτης·Χανιά;ΔΙΠΑΕ·Θεσσαλονίκη"},
+env:{n:"Μηχανικών Περιβάλλοντος",f:"2",l:"ΔΠΘ·Ξάνθη;ΔΙΠΑΕ·Θεσσαλονίκη;Πολυτεχνείο Κρήτης·Χανιά"},
+envsci:{n:"Περιβάλλοντος",f:"2",l:"Παν. Αιγαίου·Μυτιλήνη;Παν. Θεσσαλίας·Λάρισα;Ιόνιο Παν.·Ζάκυνθος"},
+energy:{n:"Συστημάτων Ενέργειας",f:"2",l:"Παν. Θεσσαλίας·Λάρισα"},
+design:{n:"Σχεδίασης Προϊόντων & Συστημάτων / Βιομηχανικής Σχεδίασης",f:"2",l:"Παν. Αιγαίου·Σύρος;Παν. Δυτ. Μακεδονίας·Κοζάνη;ΠαΔΑ·Αιγάλεω"},
+materials:{n:"Επιστήμης Υλικών",f:"2",l:"Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ηράκλειο;Παν. Ιωαννίνων·Ιωάννινα"},
+biomedeng:{n:"Μηχανικών Βιοϊατρικής",f:"2",l:"ΠαΔΑ·Αιγάλεω"},
+physics:{n:"Φυσικής",f:"2",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ηράκλειο;Παν. Ιωαννίνων·Ιωάννινα;ΔΠΘ·Καβάλα;Παν. Θεσσαλίας·Λαμία"},
+math:{n:"Μαθηματικών",f:"2",l:"ΕΚΠΑ·Αθήνα;ΕΜΠ (Εφαρμ. Μαθηματικών)·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Ιωαννίνων·Ιωάννινα;Παν. Κρήτης·Ηράκλειο;Παν. Αιγαίου·Σάμος;Παν. Δυτ. Μακεδονίας·Καστοριά;Παν. Θεσσαλίας·Λαμία"},
+stats:{n:"Στατιστικής",f:"2,4",l:"ΟΠΑ·Αθήνα;Παν. Πειραιά (& Ασφαλιστικής)·Πειραιάς;Παν. Αιγαίου (& Αναλογιστικών)·Σάμος;Παν. Δυτ. Μακεδονίας·Γρεβενά"},
+chem:{n:"Χημείας",f:"2",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ηράκλειο;Παν. Ιωαννίνων·Ιωάννινα;ΔΠΘ·Καβάλα"},
+geo:{n:"Γεωλογίας",f:"2",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα"},
+geog:{n:"Γεωγραφίας",f:"2",l:"Χαροκόπειο·Αθήνα;Παν. Αιγαίου·Μυτιλήνη"},
+bio:{n:"Βιολογίας / Μοριακής Βιολογίας / Βιοχημείας",f:"2,3",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ηράκλειο;ΔΠΘ (Μοριακής Βιολ. & Γενετικής)·Αλεξανδρούπολη;Παν. Θεσσαλίας (Βιοχημείας)·Λάρισα;Παν. Ιωαννίνων (Βιολογικών Εφαρμογών)·Ιωάννινα"},
+agri:{n:"Γεωπονίας",f:"2,3",l:"Γεωπονικό Παν.·Αθήνα;ΑΠΘ·Θεσσαλονίκη;ΔΙΠΑΕ·Θεσσαλονίκη;Παν. Θεσσαλίας·Βόλος;Παν. Θεσσαλίας·Λάρισα;Παν. Ιωαννίνων·Άρτα;ΕΛΜΕΠΑ·Ηράκλειο;Παν. Πελοποννήσου·Καλαμάτα;Παν. Πατρών·Μεσολόγγι;Παν. Δυτ. Μακεδονίας·Φλώρινα;ΔΠΘ (Αγροτικής Ανάπτυξης)·Ορεστιάδα"},
+animal:{n:"Επιστήμης Ζωικής Παραγωγής",f:"2,3",l:"Γεωπονικό Παν.·Αθήνα;Παν. Θεσσαλίας·Λάρισα"},
+fish:{n:"Ιχθυολογίας & Υδάτινου Περιβάλλοντος / Ωκεανογραφίας",f:"2,3",l:"Παν. Θεσσαλίας·Βόλος;Παν. Αιγαίου·Μυτιλήνη"},
+forest:{n:"Δασολογίας",f:"2,3",l:"ΑΠΘ·Θεσσαλονίκη;ΔΠΘ·Ορεστιάδα;Γεωπονικό Παν.·Καρπενήσι;Παν. Θεσσαλίας·Καρδίτσα;ΔΠΘ (Φυσικού Περιβάλλοντος)·Δράμα"},
+food:{n:"Επιστήμης & Τεχνολογίας Τροφίμων",f:"2,3",l:"Γεωπονικό Παν.·Αθήνα;ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Θεσσαλονίκη;Παν. Πατρών·Αγρίνιο;Ιόνιο Παν.·Αργοστόλι;Παν. Πελοποννήσου·Καλαμάτα;Παν. Θεσσαλίας·Καρδίτσα;Παν. Αιγαίου·Λήμνος"},
+wine:{n:"Επιστημών Οίνου, Αμπέλου & Ποτών",f:"2,3",l:"ΠαΔΑ·Αιγάλεω"},
+vet:{n:"Κτηνιατρικής",f:"3",l:"ΑΠΘ·Θεσσαλονίκη;Παν. Θεσσαλίας·Καρδίτσα"},
+med:{n:"Ιατρικής",f:"3",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ηράκλειο;Παν. Ιωαννίνων·Ιωάννινα;Παν. Θεσσαλίας·Λάρισα;ΔΠΘ·Αλεξανδρούπολη"},
+dent:{n:"Οδοντιατρικής",f:"3",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη"},
+pharm:{n:"Φαρμακευτικής",f:"3",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα"},
+nurse:{n:"Νοσηλευτικής",f:"3",l:"ΕΚΠΑ·Αθήνα;ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Θεσσαλονίκη;ΔΠΘ·Αλεξανδρούπολη;ΕΛΜΕΠΑ·Ηράκλειο;Παν. Ιωαννίνων·Ιωάννινα;Παν. Θεσσαλίας·Λάρισα;Παν. Πατρών·Πάτρα;Παν. Πελοποννήσου·Τρίπολη"},
+midwife:{n:"Μαιευτικής",f:"3",l:"ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Θεσσαλονίκη;Παν. Δυτ. Μακεδονίας·Πτολεμαΐδα"},
+physio:{n:"Φυσικοθεραπείας",f:"3",l:"ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Θεσσαλίας·Λαμία;Παν. Πελοποννήσου·Σπάρτη"},
+ot:{n:"Εργοθεραπείας",f:"3",l:"ΠαΔΑ·Αιγάλεω;ΔΠΘ·Κομοτηνή;Παν. Δυτ. Μακεδονίας·Πτολεμαΐδα"},
+speech:{n:"Λογοθεραπείας",f:"3",l:"Παν. Ιωαννίνων·Ιωάννινα;Παν. Πατρών·Πάτρα;Παν. Πελοποννήσου·Καλαμάτα"},
+biomed:{n:"Βιοϊατρικών Επιστημών (ακτινολογία, ιατρ. εργαστήρια, οπτική, αισθητική, οδοντοτεχνική)",f:"3",l:"ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Θεσσαλονίκη"},
+diet:{n:"Διατροφής & Διαιτολογίας",f:"3",l:"Χαροκόπειο·Αθήνα;ΔΙΠΑΕ·Θεσσαλονίκη;ΕΛΜΕΠΑ·Σητεία;Παν. Πελοποννήσου·Καλαμάτα;Παν. Θεσσαλίας·Τρίκαλα"},
+pe:{n:"Επιστήμης Φυσικής Αγωγής & Αθλητισμού (ΤΕΦΑΑ)",f:"2,3",sp:"Αθλητικές δοκιμασίες",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;ΑΠΘ·Σέρρες;ΔΠΘ·Κομοτηνή;Παν. Θεσσαλίας·Τρίκαλα"},
+sportmgmt:{n:"Οργάνωσης & Διαχείρισης Αθλητισμού",f:"4",l:"Παν. Πελοποννήσου·Σπάρτη"},
+psy:{n:"Ψυχολογίας",f:"1,3",l:"ΕΚΠΑ·Αθήνα;Πάντειο·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Ιωαννίνων·Ιωάννινα;Παν. Κρήτης·Ρέθυμνο;ΔΠΘ·Διδυμότειχο;Παν. Δυτ. Μακεδονίας·Φλώρινα"},
+social:{n:"Κοινωνικής Εργασίας",f:"1,3",l:"ΠαΔΑ·Αιγάλεω;ΕΛΜΕΠΑ·Ηράκλειο;ΔΠΘ·Κομοτηνή;Παν. Πατρών·Πάτρα"},
+socio:{n:"Κοινωνιολογίας",f:"1",l:"ΕΚΠΑ·Αθήνα;Πάντειο·Αθήνα;Παν. Αιγαίου·Μυτιλήνη;Παν. Κρήτης·Ρέθυμνο"},
+anthro:{n:"Κοινωνικής Ανθρωπολογίας",f:"1",l:"Πάντειο·Αθήνα;Παν. Αιγαίου·Μυτιλήνη;Παν. Θεσσαλίας·Βόλος"},
+hist:{n:"Ιστορίας & Αρχαιολογίας",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Ιωαννίνων·Ιωάννινα;Παν. Κρήτης·Ρέθυμνο;Παν. Πατρών·Πάτρα;Παν. Πελοποννήσου·Καλαμάτα;Παν. Θεσσαλίας·Βόλος;Ιόνιο Παν.·Κέρκυρα"},
+phil:{n:"Φιλολογίας",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Ιωαννίνων·Ιωάννινα;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ρέθυμνο;Παν. Πελοποννήσου·Καλαμάτα"},
+philo:{n:"Φιλοσοφίας",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ (& Παιδαγωγικής)·Θεσσαλονίκη;Παν. Ιωαννίνων·Ιωάννινα;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ρέθυμνο"},
+lang:{n:"Ξένων Γλωσσών & Φιλολογιών (Αγγλ., Γαλλ., Γερμ., Ιταλ., Ισπ.)",f:"1",sp:"Ξένη γλώσσα",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη"},
+transl:{n:"Ξένων Γλωσσών, Μετάφρασης & Διερμηνείας",f:"1",sp:"Δύο ξένες γλώσσες",l:"Ιόνιο Παν.·Κέρκυρα"},
+theol:{n:"Θεολογίας",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη"},
+law:{n:"Νομικής",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;ΔΠΘ·Κομοτηνή"},
+pol:{n:"Πολιτικής Επιστήμης",f:"1",l:"ΕΚΠΑ·Αθήνα;Πάντειο·Αθήνα;ΔΠΘ·Κομοτηνή;Παν. Κρήτης·Ρέθυμνο;Παν. Πελοποννήσου·Κόρινθος"},
+intl:{n:"Διεθνών & Ευρωπαϊκών Σπουδών",f:"1,4",l:"Πάντειο·Αθήνα;ΟΠΑ·Αθήνα;Παν. Μακεδονίας·Θεσσαλονίκη;Παν. Πειραιά·Πειραιάς;Παν. Δυτ. Μακεδονίας·Κοζάνη"},
+media:{n:"Επικοινωνίας, ΜΜΕ & Δημοσιογραφίας",f:"1,4",sp:"Ξένη γλώσσα",l:"ΕΚΠΑ·Αθήνα;Πάντειο·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Δυτ. Μακεδονίας·Καστοριά;Ιόνιο Παν.·Αργοστόλι"},
+culture:{n:"Πολιτισμικής Τεχνολογίας & Επικοινωνίας",f:"1,4",l:"Παν. Αιγαίου·Μυτιλήνη"},
+theatre:{n:"Θεατρικών Σπουδών",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Πατρών·Πάτρα;Παν. Πελοποννήσου·Ναύπλιο"},
+film:{n:"Κινηματογράφου / Ψηφιακών Τεχνών / Φωτογραφίας & Οπτικοακουστικών",f:"1,2",l:"ΑΠΘ·Θεσσαλονίκη;ΕΚΠΑ·Ψαχνά Εύβοιας;ΠαΔΑ·Αιγάλεω;Ιόνιο Παν. (Τεχνών Ήχου & Εικόνας)·Κέρκυρα;Παν. Πελοποννήσου (Παραστατικών & Ψηφιακών Τεχνών)·Ναύπλιο"},
+music:{n:"Μουσικών Σπουδών",f:"1,2",sp:"Μουσικά μαθήματα",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Μακεδονίας·Θεσσαλονίκη;Ιόνιο Παν.·Κέρκυρα;Παν. Ιωαννίνων·Άρτα"},
+musictech:{n:"Μουσικής Τεχνολογίας & Ακουστικής / Τεχνών Ήχου",f:"2",l:"ΕΛΜΕΠΑ·Ρέθυμνο;Ιόνιο Παν.·Κέρκυρα"},
+graphic:{n:"Γραφιστικής & Οπτικής Επικοινωνίας",f:"1,2",sp:"Ελεύθερο & Γραμμικό Σχέδιο",l:"ΠαΔΑ·Αιγάλεω"},
+fashion:{n:"Δημιουργικού Σχεδιασμού & Ένδυσης",f:"2",l:"ΔΙΠΑΕ·Κιλκίς"},
+conserv:{n:"Συντήρησης Αρχαιοτήτων & Έργων Τέχνης",f:"1,2",l:"ΠαΔΑ·Αιγάλεω"},
+finearts:{n:"Καλών / Εικαστικών Τεχνών",f:"—",sp:"Ειδική εξέταση σχεδίου (επιβεβαίωσε)",l:"ΑΣΚΤ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;Παν. Δυτ. Μακεδονίας·Φλώρινα;Παν. Ιωαννίνων·Ιωάννινα"},
+prim:{n:"Παιδαγωγικό Δημοτικής Εκπαίδευσης",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;ΔΠΘ·Αλεξανδρούπολη;Παν. Θεσσαλίας·Βόλος;Παν. Ιωαννίνων·Ιωάννινα;Παν. Κρήτης·Ρέθυμνο;Παν. Αιγαίου·Ρόδος;Παν. Δυτ. Μακεδονίας·Φλώρινα;Παν. Πατρών·Πάτρα"},
+pre:{n:"Παιδαγωγικό Προσχολικής Εκπαίδευσης (Νηπιαγωγών)",f:"1",l:"ΕΚΠΑ·Αθήνα;ΑΠΘ·Θεσσαλονίκη;ΔΠΘ·Αλεξανδρούπολη;Παν. Θεσσαλίας·Βόλος;Παν. Ιωαννίνων·Ιωάννινα;Παν. Κρήτης·Ρέθυμνο;Παν. Αιγαίου·Ρόδος;Παν. Δυτ. Μακεδονίας·Φλώρινα;Παν. Πατρών·Πάτρα"},
+special:{n:"Παιδαγωγικό Ειδικής Αγωγής",f:"1",l:"Παν. Θεσσαλίας·Βόλος"},
+early:{n:"Αγωγής & Φροντίδας στην Πρώιμη Παιδική Ηλικία",f:"1,3",l:"ΠαΔΑ·Αιγάλεω;ΔΙΠΑΕ·Θεσσαλονίκη;Παν. Ιωαννίνων·Ιωάννινα"},
+lib:{n:"Αρχειονομίας & Βιβλιοθηκονομίας",f:"1,4",l:"Ιόνιο Παν.·Κέρκυρα;ΠαΔΑ·Αιγάλεω"},
+aspete:{n:"ΑΣΠΑΙΤΕ – Εκπαιδευτικών Μηχανικών",f:"2",l:"ΑΣΠΑΙΤΕ·Αθήνα (Μαρούσι)"},
+econ:{n:"Οικονομικών Επιστημών",f:"4",l:"ΟΠΑ·Αθήνα;ΕΚΠΑ·Αθήνα;Παν. Πειραιά·Πειραιάς;ΑΠΘ·Θεσσαλονίκη;Παν. Μακεδονίας·Θεσσαλονίκη;Παν. Θεσσαλίας·Βόλος;Παν. Ιωαννίνων·Ιωάννινα;Παν. Πατρών·Πάτρα;Παν. Κρήτης·Ρέθυμνο;ΔΠΘ·Κομοτηνή;ΔΙΠΑΕ·Σέρρες;Παν. Πελοποννήσου·Τρίπολη;Παν. Δυτ. Μακεδονίας·Καστοριά"},
+acc:{n:"Λογιστικής & Χρηματοοικονομικής",f:"4",l:"ΟΠΑ·Αθήνα;ΠαΔΑ·Αιγάλεω;Παν. Μακεδονίας·Θεσσαλονίκη;ΔΙΠΑΕ·Θεσσαλονίκη;ΕΛΜΕΠΑ·Ηράκλειο;ΔΠΘ·Καβάλα;Παν. Πελοποννήσου·Καλαμάτα;Παν. Δυτ. Μακεδονίας·Κοζάνη;Παν. Θεσσαλίας·Λάρισα;Παν. Ιωαννίνων·Πρέβεζα"},
+finance:{n:"Χρηματοοικονομικής & Τραπεζικής",f:"4",l:"Παν. Πειραιά·Πειραιάς;ΟΠΑ (Λογιστικής & Χρημ/κής)·Αθήνα"},
+bus:{n:"Διοίκησης / Οργάνωσης Επιχειρήσεων",f:"4",l:"ΟΠΑ·Αθήνα;ΕΚΠΑ·Αθήνα;Παν. Πειραιά·Πειραιάς;Παν. Μακεδονίας·Θεσσαλονίκη;ΠαΔΑ·Αιγάλεω;Παν. Θεσσαλίας·Λάρισα;Παν. Πατρών·Πάτρα;Παν. Αιγαίου·Χίος;Παν. Πελοποννήσου·Καλαμάτα;ΔΙΠΑΕ·Σέρρες;Παν. Δυτ. Μακεδονίας·Γρεβενά"},
+mkt:{n:"Μάρκετινγκ & Επικοινωνίας",f:"4",l:"ΟΠΑ·Αθήνα;ΔΙΠΑΕ (Διοίκ. Οργανισμών, Μάρκετινγκ & Τουρισμού)·Θεσσαλονίκη"},
+tour:{n:"Τουρισμού",f:"4",l:"ΠαΔΑ·Αιγάλεω;Παν. Πατρών·Πάτρα;ΕΛΜΕΠΑ·Ηράκλειο;ΔΙΠΑΕ·Θεσσαλονίκη;Παν. Αιγαίου·Χίος;ΑΣΤΕ·Ρόδος;ΑΣΤΕ·Κρήτη"},
+ship:{n:"Ναυτιλιακών Σπουδών / Λιμένων & Ναυτιλίας",f:"4",l:"Παν. Πειραιά·Πειραιάς;ΕΚΠΑ·Ψαχνά Εύβοιας"},
+logist:{n:"Εφοδιαστικής Αλυσίδας",f:"4",l:"ΔΙΠΑΕ·Κατερίνη;Γεωπονικό Παν.·Θήβα"},
+pubadm:{n:"Δημόσιας Διοίκησης / Διοικητικής Επιστήμης",f:"1,4",l:"Πάντειο·Αθήνα;ΕΚΠΑ·Αθήνα;ΟΠΑ·Αθήνα;ΔΠΘ·Καβάλα;Παν. Πατρών·Πάτρα;Παν. Πελοποννήσου·Τρίπολη;Παν. Δυτ. Μακεδονίας·Κοζάνη;ΕΛΜΕΠΑ·Άγ. Νικόλαος"},
+regdev:{n:"Περιφερειακής & Οικονομικής Ανάπτυξης",f:"1,4",l:"Πάντειο·Αθήνα;Γεωπονικό Παν.·Άμφισσα"}
+};
+
+const T={
+ R:{n:"Ρεαλιστικός",d:"Εργαλεία, μηχανές, κατασκευές, ύπαιθρος. Μαθαίνεις κάνοντας.",sk:["Χρήση εργαλείων και μηχανημάτων","Κατασκευή και συναρμολόγηση","Επισκευή και συντήρηση","Τεχνικό σχέδιο και μετρήσεις","Οδήγηση και χειρισμός οχημάτων","Σωματική αντοχή","Δεξιοτεχνία στα χέρια","Ασφάλεια στη δουλειά","Δουλειά στη φύση, με φυτά και ζώα","Χειρισμός ιατρικού ή εργαστηριακού εξοπλισμού"]},
+ I:{n:"Ερευνητικός",d:"Παρατήρηση, ανάλυση, επίλυση προβλημάτων, επιστήμη.",sk:["Αναλυτική σκέψη","Μαθηματικά","Φυσική, χημεία, βιολογία","Έρευνα και αναζήτηση πληροφοριών","Επίλυση προβλημάτων","Παρατηρητικότητα","Προγραμματισμός υπολογιστών","Κριτική σκέψη","Ανάλυση δεδομένων","Συνεχής μελέτη"]},
+ A:{n:"Καλλιτεχνικός",d:"Δημιουργία, έκφραση, φαντασία, ελευθερία στον τρόπο δουλειάς.",sk:["Δημιουργικότητα και φαντασία","Σχέδιο και ζωγραφική","Αίσθηση χρώματος και σύνθεσης","Γραπτή έκφραση","Έκφραση με τη φωνή και το σώμα","Μουσικότητα και ρυθμός","Ψηφιακός σχεδιασμός","Αισθητική κρίση","Πρωτότυπες ιδέες","Χειροτεχνία και αίσθηση υλικών"]},
+ S:{n:"Κοινωνικός",d:"Βοήθεια, διδασκαλία, φροντίδα, συνεργασία με ανθρώπους.",sk:["Επικοινωνία","Ενσυναίσθηση","Υπομονή","Διδασκαλία και εξήγηση","Φροντίδα ανθρώπων","Ομαδική δουλειά","Ενεργητική ακρόαση","Εξυπηρέτηση κοινού","Επίλυση συγκρούσεων","Ψυχραιμία υπό πίεση"]},
+ E:{n:"Επιχειρηματικός",d:"Πειθώ, ηγεσία, οργάνωση, ανάληψη πρωτοβουλίας και ρίσκου.",sk:["Ηγεσία","Πειθώ","Διαπραγμάτευση","Λήψη αποφάσεων","Πρωτοβουλία","Οργάνωση ομάδων και έργων","Πωλήσεις","Ανάληψη ρίσκου","Δημόσια ομιλία","Κοστολόγηση και διαχείριση χρημάτων"]},
+ C:{n:"Συμβατικός",d:"Τάξη, ακρίβεια, δεδομένα, σαφείς κανόνες και διαδικασίες.",sk:["Οργάνωση και τάξη","Ακρίβεια","Τήρηση κανόνων και διαδικασιών","Διαχείριση αρχείων","Αριθμητική ικανότητα","Υπολογιστές και λογισμικό γραφείου","Τήρηση χρόνων","Έλεγχος ποιότητας","Γνώση νομοθεσίας","Προγραμματισμός εργασιών"]}
+};
+const ORD="RIASEC".split("");
+const EPAL={M:"Μηχανολογίας",H:"Ηλεκτρολογίας, Ηλεκτρονικής & Αυτοματισμού",P:"Πληροφορικής",Y:"Υγείας–Πρόνοιας–Ευεξίας",G:"Γεωπονίας, Τροφίμων & Περιβάλλοντος",D:"Δομικών Έργων & Αρχιτεκτονικού Σχεδιασμού",O:"Διοίκησης & Οικονομίας",T:"Εφαρμοσμένων Τεχνών",N:"Ναυτιλιακών Επαγγελμάτων"};
+const SPEC={S:"Στρατιωτική σχολή",A:"Σχολή Σωμάτων Ασφαλείας",N:"Ακαδημία Εμπορικού Ναυτικού",D:"Δραματική σχολή / Χορού",O:"Ωδείο",X:"Σχολή Ξεναγών",L:"Άδεια / πιστοποίηση",P:"Διαγωνισμός δημοσίου"};
+const CAT={"@":"ΑΕΙ",k:"ΣΑΕΚ",e:"ΕΠΑΛ",s:"Ειδικές"};
+for(const k in DEPT){DEPT[k].L=DEPT[k].l.split(";").map(x=>{const[i,c]=x.split("·");return{i,c}})}
+const CITIES=[...new Set(Object.values(DEPT).flatMap(d=>d.L.map(x=>x.c.replace(/ \(.*\)$/,""))))].sort((a,b)=>a.localeCompare(b,"el"));
+const J={};
+for(const k in RAW) J[k]=RAW[k].trim().split("\n").map(l=>{const[n,c,p,s]=l.split("|");const sk=[];s.replace(/([RIASEC])(\d)(\d)/g,(m,L,a,b)=>{sk.push([L,+a],[L,+b])});const toks=p.trim().split(/\s+/);return{n,c,p:toks,d:toks.filter(t=>t[0]==="@").map(t=>t.slice(1)),sk}});
+
+/* ζήτηση κλάδου (Cedefop 2025, ManpowerGroup 2025, ΣΕΒ/ΟΚΕ) */
+const DEMAND=[
+ {t:"Πληροφορική & δεδομένα",test:j=>j.d.some(d=>["ceid","digsys"].includes(d))||/developer|Προγραμματιστ|κυβερνοασφ|δικτύων|υπολογιστ|IT support|Data|δεδομένων|τεχνητής νοημ|UX|UI designer|Web|e-learning|BI /i.test(j.n)},
+ {t:"Υγεία",test:j=>j.d.some(d=>["med","nurse","dent","pharm","physio","ot","speech","midwife","biomed","diet"].includes(d))},
+ {t:"Μηχανικοί & τεχνικοί",test:j=>j.p.some(t=>["eM","eH","eD"].includes(t))||j.d.some(d=>["mech","elec","civ","chemeng","energy","prod","electronic"].includes(d))||/Ηλεκτρολόγ|Υδραυλικ|Ψυκτικ|αυτοματισμ|συγκολλητ|CNC|ασανσέρ|φωτοβολταϊκ|Εργοδηγός|μπουλντόζ|καλοριφέρ|ανεμογεννητρ/i.test(j.n)},
+ {t:"Τουρισμός & εστίαση",test:j=>j.d.includes("tour")||/Μάγειρ|Σεφ|σεφ|Ζαχαροπλάστ|ξενοδοχ|Ρεσεψιον|Μπαρίστα|Φούρναρ|Animator/i.test(j.n)},
+ {t:"Πωλήσεις & marketing",test:j=>j.d.includes("mkt")||/Πωλητ|marketing|Social media|e-shop/i.test(j.n)}
+];
+function demandOf(j){const d=DEMAND.find(x=>x.test(j));return d?d.t:null}
+
+function pathLabels(j){
+  const out=[];
+  if(j.d.length){const f=[...new Set(j.d.flatMap(d=>DEPT[d].f.split(",")).filter(x=>x!=="—"))].sort();out.push({cat:"ΑΕΙ",txt:"ΑΕΙ"+(f.length?" · Πεδίο "+f.join("/"):"")})}
+  j.p.forEach(t=>{
+    if(t==="k") out.push({cat:"ΣΑΕΚ",txt:"ΣΑΕΚ"});
+    else if(t[0]==="e") out.push({cat:"ΕΠΑΛ",txt:"ΕΠΑΛ · "+EPAL[t[1]]});
+    else if(t[0]==="s") out.push({cat:"Ειδικές",txt:SPEC[t[1]]});
+  });
+  return out;
+}
+const catsOf=j=>new Set(pathLabels(j).map(x=>x.cat));
+const W=[[22,10,4],[10,5,2],[4,2,1]];
+function iachanM(person,occ){let s=0;for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(person[i]===occ[j])s+=W[i][j];return s}
+function tier(m){return m===28?["m3","Πλήρης"]:m>=21?["m2","Υψηλή"]:["m1","Μέτρια"]}
+
+const EX={R:32,I:28,A:21,S:18,E:14,C:11};
+const store={get(k,d){try{const v=localStorage.getItem("hol:"+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("hol:"+k,JSON.stringify(v))}catch(e){}}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let scores=store.get("scores",null), isEx=!scores; if(!scores) scores={...EX};
+let order=store.get("order",null);
+let checks=store.get("checks4",{});
+let rating=store.get("rating",{});
+let filter="Όλα", city=store.get("city","");
+
+["st-name","st-class","st-date","q1","q2","q3"].forEach(id=>{const el=$(id);el.value=store.get(id,"");el.addEventListener("input",()=>{store.set(id,el.value);if(id==="st-class")updCode()})});
+
+ORD.forEach(k=>{
+  const w=document.createElement("label");w.className="score";
+  w.innerHTML=`<span class="dot" style="background:var(--${k})">${k}</span><span class="lb">${T[k].n}</span><input id="s-${k}" type="number" inputmode="numeric" min="0" step="1" value="${scores[k]}" aria-label="Βαθμολογία ${T[k].n}">`;
+  $("scores").appendChild(w);
+  w.querySelector("input").addEventListener("input",e=>{scores[k]=Math.max(0,parseFloat(e.target.value)||0);isEx=false;store.set("scores",scores);order=null;store.set("order",null);rank();render()});
+});
+["o1","o2","o3"].forEach(id=>{
+  const s=$(id);s.innerHTML=ORD.map(k=>`<option value="${k}">${k} · ${T[k].n}</option>`).join("");
+  s.addEventListener("change",()=>{order=[$("o1").value,$("o2").value,$("o3").value];store.set("order",order);render()});
+});
+$("city").innerHTML+=CITIES.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+$("city").value=city;
+$("city").addEventListener("change",e=>{city=e.target.value;store.set("city",city);renderJobs()});
+
+let sorted=[],tieNote="";
+function rank(){
+  sorted=[...ORD].sort((a,b)=>scores[b]-scores[a]||ORD.indexOf(a)-ORD.indexOf(b));
+  tieNote="";
+  if(scores[sorted[2]]===scores[sorted[3]]) tieNote=`Ισοβαθμία στην 3η θέση (${sorted[2]} και ${sorted[3]}). Διάλεξε με το χέρι αυτόν που σου ταιριάζει περισσότερο.`;
+  else if(scores[sorted[0]]===scores[sorted[1]]||scores[sorted[1]]===scores[sorted[2]]) tieNote="Υπάρχει ισοβαθμία μέσα στους τρεις πρώτους. Έλεγξε τη σειρά, γιατί αλλάζει το ποσοστό ταύτισης των επαγγελμάτων.";
+  if(!order) order=sorted.slice(0,3);
+}
+const hexPt=(i,r)=>{const a=(-120+60*i)*Math.PI/180;return[220+r*Math.cos(a),180+r*Math.sin(a)]};
+const hexDist=(a,b)=>{const d=Math.abs(ORD.indexOf(a)-ORD.indexOf(b));return Math.min(d,6-d)};
+const keyOf=(o=order)=>[...o].sort((a,b)=>ORD.indexOf(a)-ORD.indexOf(b)).join("");
+const valid=()=>new Set(order).size===3;
+
+const LIVE={R:"var(--R)",I:"var(--I)",A:"var(--A)",S:"var(--S)",E:"var(--E)",C:"var(--C)",line:"var(--line)",muted:"var(--muted)",ink:"var(--ink)",paper:"var(--paper)",accent:"var(--accent)",tri:"var(--tri)",radar:"var(--radar)",font:"var(--font)"};
+const PRINT={R:"#c2571a",I:"#2f6fb5",A:"#9b3fa8",S:"#2c8a5a",E:"#c0392b",C:"#5e6b7d",line:"#d8dee8",muted:"#5b6678",ink:"#1b2433",paper:"#ffffff",accent:"#2f5bd3",tri:"rgba(47,91,211,.12)",radar:"rgba(27,36,51,.10)",font:"Commissioner, Arial, sans-serif"};
+
+function hexSVG(P,sc,ord,unit){
+  const R=118, mx=Math.max(1,...ORD.map(k=>sc[k])), v=ord&&new Set(ord).size===3;
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 0 560 360" width="560" height="360">`;
+  [1/3,2/3].forEach(f=>{s+=`<polygon points="${ORD.map((k,i)=>hexPt(i,R*f).join(",")).join(" ")}" fill="none" stroke="${P.line}" stroke-width="1"/>`});
+  s+=`<polygon points="${ORD.map((k,i)=>hexPt(i,R).join(",")).join(" ")}" fill="none" stroke="${P.line}" stroke-width="2"/>`;
+  ORD.forEach((k,i)=>{const p=hexPt(i,R);s+=`<line x1="220" y1="180" x2="${p[0]}" y2="${p[1]}" stroke="${P.line}" stroke-width="1" stroke-dasharray="3 4"/>`});
+  s+=`<polygon points="${ORD.map((k,i)=>hexPt(i,R*sc[k]/mx).join(",")).join(" ")}" fill="${P.radar}" stroke="${P.muted}" stroke-width="1.5" stroke-linejoin="round"/>`;
+  if(v) s+=`<polygon points="${ord.map(k=>hexPt(ORD.indexOf(k),R).join(",")).join(" ")}" fill="${P.tri}" stroke="${P.accent}" stroke-width="3" stroke-linejoin="round"/>`;
+  ORD.forEach((k,i)=>{
+    const [x,y]=hexPt(i,R), on=v&&ord.includes(k), r=v?ord.indexOf(k)+1:0;
+    const [lx,ly]=hexPt(i,R+36);
+    const anchor=Math.abs(lx-220)<20?"middle":(lx>220?"start":"end");
+    const lxx=anchor==="start"?lx-14:anchor==="end"?lx+14:lx;
+    s+=`<circle cx="${x}" cy="${y}" r="${on?20:15}" fill="${on?P[k]:P.paper}" stroke="${P[k]}" stroke-width="2.5"/>`;
+    s+=`<text x="${x}" y="${y+5}" text-anchor="middle" font-size="${on?15:13}" font-weight="800" fill="${on?"#fff":P[k]}" font-family="${P.font}">${k}</text>`;
+    s+=`<text x="${lxx}" y="${ly+5}" text-anchor="${anchor}" font-size="14" font-weight="${on?700:500}" fill="${on?P.ink:P.muted}" font-family="${P.font}">${T[k].n}${on?` (${r})`:""}</text>`;
+    s+=`<text x="${lxx}" y="${ly+22}" text-anchor="${anchor}" font-size="12" fill="${P.muted}" font-family="${P.font}">${(Math.round(sc[k]*10)/10)} ${unit||"μον."}</text>`;
+  });
+  return s+"</svg>";
+}
+
+function kpisFor(sc,ord){
+  const vals=ORD.map(k=>sc[k]), tot=vals.reduce((a,b)=>a+b,0)||1, mx=Math.max(...vals);
+  const srt=[...ORD].sort((a,b)=>sc[b]-sc[a]||ORD.indexOf(a)-ORD.indexOf(b)), s=srt.map(k=>sc[k]);
+  const diff=mx?((s[0]-(s[1]+s[3])/2)/mx*100):0;
+  const conc=ord.reduce((a,k)=>a+sc[k],0)/tot*100;
+  const gap=mx?((sc[ord[2]]-Math.max(...ORD.filter(k=>!ord.includes(k)).map(k=>sc[k])))/mx*100):0;
+  return {dist:hexDist(ord[0],ord[1]),diff,conc,gap};
+}
+function computeKPIs(){
+  const k=kpisFor(scores,order);
+  const lv=(v,hi,lo)=>v>=hi?["hi","Υψηλή"]:v>=lo?["md","Μέτρια"]:["lo","Χαμηλή"];
+  return [
+    {l:"Συνέπεια",v:`${order[0]}–${order[1]}`,c:k.dist===1?["hi","Υψηλή"]:k.dist===2?["md","Μέτρια"]:["lo","Χαμηλή"],s:k.dist===1?"Ο 1ος και ο 2ος τύπος είναι γειτονικοί στο εξάγωνο.":k.dist===2?"Απέχουν μία κορυφή στο εξάγωνο.":"Βρίσκονται απέναντι στο εξάγωνο."},
+    {l:"Διαφοροποίηση",v:`${Math.round(k.diff)}%`,c:lv(k.diff,25,12),s:"Δείκτης Iachan: πόσο ξεχωρίζει ο 1ος τύπος.",raw:k.diff},
+    {l:"Συγκέντρωση",v:`${Math.round(k.conc)}%`,c:lv(k.conc,62,55),s:"Μερίδιο των 3 τύπων του τριγώνου στο σύνολο."},
+    {l:"Σαφήνεια",v:`${k.gap>0?"+":""}${Math.round(k.gap)}%`,c:k.gap>=10?["hi","Καθαρό"]:k.gap>0?["md","Οριακό"]:["lo","Ασαφές"],s:"Απόσταση 3ου από 4ο τύπο.",raw:k.gap}
+  ];
+}
+function jobsScored(){
+  return (J[keyOf()]||[]).map(j=>({...j,m:iachanM(order,j.c)})).sort((a,b)=>b.m-a.m||a.n.localeCompare(b.n,"el"));
+}
+function pathCounts(list){const c={ΑΕΙ:0,ΣΑΕΚ:0,ΕΠΑΛ:0,Ειδικές:0};list.forEach(j=>catsOf(j).forEach(x=>c[x]++));return c}
+
+function analytics(){
+  const K=computeKPIs();
+  $("kpis").innerHTML=K.map(k=>`<div class="kpi"><span class="l">${k.l}</span><span class="v">${k.v}</span><span class="chip ${k.c[0]}">${k.c[1]}</span><span class="s">${k.s}</span></div>`).join("");
+  const mx=Math.max(...ORD.map(k=>scores[k])), mean=ORD.reduce((a,k)=>a+scores[k],0)/6;
+  const scaleMax=Math.max(10,Math.ceil(mx/10)*10);
+  $("bars").innerHTML=sorted.map(k=>{const on=order.includes(k);return `<div class="bar"><span class="nm" style="color:${on?`var(--${k})`:"var(--muted)"}">${k} · ${T[k].n}</span><span class="tr"><span class="fl" style="width:${scores[k]/scaleMax*100}%;background:var(--${k});opacity:${on?1:.35}"></span><span class="mean" style="left:${mean/scaleMax*100}%"></span></span><span class="vl">${scores[k]}</span></div>`}).join("");
+  $("axis").innerHTML=`<div></div><div><span>0</span><span>${scaleMax/2}</span><span>${scaleMax}</span></div><div></div>`;
+  const list=jobsScored(), cnt=pathCounts(list);
+  $("paths").innerHTML=Object.entries(cnt).map(([p,c])=>`<div class="bar" style="grid-template-columns:70px minmax(0,1fr) 28px"><span class="nm">${p}</span><span class="tr"><span class="fl" style="width:${c/30*100}%;background:var(--accent)"></span></span><span class="vl">${c}</span></div>`).join("");
+  const tc={Πλήρης:0,Υψηλή:0,Μέτρια:0};list.forEach(j=>tc[tier(j.m)[1]]++);
+  const tcol={Πλήρης:"var(--ok)",Υψηλή:"var(--accent)",Μέτρια:"var(--muted)"};
+  $("tiers").innerHTML=Object.entries(tc).map(([p,c])=>`<div class="bar" style="grid-template-columns:70px minmax(0,1fr) 28px"><span class="nm">${p}</span><span class="tr"><span class="fl" style="width:${c/30*100}%;background:${tcol[p]}"></span></span><span class="vl">${c}</span></div>`).join("");
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  const diff=K[1].raw, gap=K[3].raw, parts=[];
+  parts.push(diff>=25?`Το προφίλ σου έχει καθαρή κορυφή στον ${T[sorted[0]].n.toLowerCase()} τύπο.`:diff>=12?`Ο ${T[sorted[0]].n.toLowerCase()} τύπος προηγείται, αλλά όχι με μεγάλη διαφορά.`:`Το προφίλ σου είναι επίπεδο. Έχεις παρόμοιο ενδιαφέρον για πολλούς τύπους, κάτι συνηθισμένο σε αυτή την ηλικία.`);
+  if(gap<=0) parts.push(`Ο 3ος τύπος ισοβαθμεί ή υστερεί από άλλον. Δοκίμασε και το εναλλακτικό τρίγωνο αλλάζοντας τον 3ο τύπο.`);
+  else if(gap<10) parts.push(`Ο 3ος τύπος δεν απέχει πολύ από τον 4ο (${sorted[3]}). Αξίζει να δεις και αυτό το τρίγωνο.`);
+  const dem=list.filter(j=>demandOf(j)).length;
+  parts.push(`${tc.Πλήρης+tc.Υψηλή} από τα 30 επαγγέλματα έχουν υψηλή ή πλήρη ταύτιση με τη σειρά ${order.join("")}. Οι περισσότερες διαδρομές περνούν από ${top[0]} (${top[1]} από 30). ${dem} ανήκουν σε κλάδους με αυξημένη ζήτηση σήμερα.`);
+  $("read").innerHTML=`<b>Ανάγνωση:</b> ${parts.join(" ")}`;
+}
+
+function skillLines(j){
+  const by={};j.sk.forEach(([L,i])=>(by[L]=by[L]||[]).push(T[L].sk[i]));
+  return [...j.c].map(L=>`<span><i style="color:var(--${L})">${L}</i> ${by[L].join(" · ")}</span>`).join("");
+}
+function deptHTML(j){
+  if(!j.d.length) return "";
+  return `<details class="uni"><summary>Πού σπουδάζεις (${j.d.reduce((a,d)=>a+DEPT[d].L.length,0)} τμήματα)</summary>${j.d.map(d=>{const D=DEPT[d];return `<div class="d"><b>${esc(D.n)}</b><span class="hint" style="font-size:11.5px">Πεδίο ${D.f}${D.sp?" · ειδικό μάθημα: "+esc(D.sp):""}</span><div class="cities">${D.L.map(x=>`<span class="${city&&x.c.startsWith(city)?"near":""}">${esc(x.i)} · ${esc(x.c)}</span>`).join("")}</div></div>`}).join("")}</details>`;
+}
+function inCity(j){return !city||j.d.some(d=>DEPT[d].L.some(x=>x.c.startsWith(city)))}
+
+function renderJobs(){
+  const key=keyOf(), list=jobsScored();
+  const opts=["Όλα","ΑΕΙ","ΣΑΕΚ","ΕΠΑΛ","Ειδικές"];
+  const cnt=pathCounts(list);
+  $("filters").innerHTML=opts.map(o=>{const c=o==="Όλα"?list.length:cnt[o];return `<button type="button" data-f="${o}" aria-pressed="${filter===o}" ${c?"":"disabled"}>${o}<span>${c}</span></button>`}).join("");
+  $("filters").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{filter=b.dataset.f;renderJobs()}));
+  let shown=list.filter(j=>filter==="Όλα"||catsOf(j).has(filter));
+  if(city) shown=shown.filter(inCity);
+  $("jobs").innerHTML=shown.length?shown.map(j=>{const id=key+"|"+j.n, t=tier(j.m), dm=demandOf(j);
+    return `<li><div class="job ${t[0]} ${checks[id]?"on":""}"><label class="top"><input type="checkbox" data-id="${esc(id)}" ${checks[id]?"checked":""}><span class="t">${esc(j.n)}</span></label>
+      <span class="row"><span class="jc">${[...j.c].map(L=>`<span style="color:var(--${L})">${L}</span>`).join("")}</span><span class="match ${t[0]}">${Math.round(j.m/28*100)}% · ${t[1]}</span>${dm?`<span class="dem" title="Κλάδος με αυξημένη ζήτηση">↑ ${dm}</span>`:""}</span>
+      <span class="row">${pathLabels(j).map(x=>`<span class="tag">${esc(x.txt)}</span>`).join("")}</span>
+      <span class="sk">${skillLines(j)}</span>
+      ${deptHTML(j)}
+    </div></li>`}).join(""):`<li class="hint">Κανένα επάγγελμα του τριγώνου σου δεν έχει τμήμα ΑΕΙ στην πόλη ${esc(city)} με αυτό το φίλτρο. Δοκίμασε άλλη πόλη ή «Οποιαδήποτε πόλη».</li>`;
+  $("jobs").querySelectorAll("input").forEach(c=>c.addEventListener("change",()=>{checks[c.dataset.id]=c.checked;store.set("checks4",checks);c.closest(".job").classList.toggle("on",c.checked);updPicked();renderAssess();updCode()}));
+  updPicked();
+}
+function pickedList(){const key=keyOf();return jobsScored().filter(j=>checks[key+"|"+j.n])}
+function updPicked(){const n=pickedList().length;$("picked").textContent=(n?`Τσέκαρες ${n} από 30 επαγγέλματα.`:"Δεν έχεις τσεκάρει ακόμα επαγγέλματα.")+(city?` Φίλτρο πόλης: ${city} (εμφανίζονται μόνο επαγγέλματα με τμήμα ΑΕΙ εκεί).`:"")}
+
+/* αυτοαξιολόγηση */
+function assessSkills(){
+  const p=pickedList(); const src=p.length?p:jobsScored().slice(0,5);
+  const m=new Map();src.forEach(j=>j.sk.forEach(([L,i])=>{const k=L+i;m.set(k,(m.get(k)||0)+1)}));
+  return {fromPicked:p.length>0,list:[...m.entries()].sort((a,b)=>order.indexOf(a[0][0])-order.indexOf(b[0][0])||b[1]-a[1]).map(([k,c])=>({L:k[0],i:+k.slice(1),c}))};
+}
+function renderAssess(){
+  if(!valid()){$("assess").innerHTML="";$("assess-sum").innerHTML="";return}
+  const {fromPicked,list}=assessSkills();
+  $("assess-hint").textContent=fromPicked?`Οι δεξιότητες που ζητούν τα επαγγέλματα που τσέκαρες. Βαθμολόγησε από 1 (καθόλου ακόμα) έως 5 (πολύ καλά).`:`Τσέκαρε επαγγέλματα στο Βήμα 4 για να δεις τις δικές τους δεξιότητες. Μέχρι τότε εμφανίζονται οι δεξιότητες των 5 πρώτων επαγγελμάτων της λίστας.`;
+  $("assess").innerHTML=list.map(s=>{const k=s.L+s.i, r=rating[k]||0;return `<div class="arow"><span class="L" style="color:var(--${s.L})">${s.L}</span><span>${T[s.L].sk[s.i]}${s.c>1?` <span class="hint" style="font-size:12px">· σε ${s.c} επαγγέλματα</span>`:""}</span><span class="seg" role="group" aria-label="${esc(T[s.L].sk[s.i])}">${[1,2,3,4,5].map(n=>`<button type="button" data-k="${k}" data-n="${n}" aria-pressed="${r===n}">${n}</button>`).join("")}</span></div>`}).join("");
+  $("assess").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.k,n=+b.dataset.n;rating[k]=rating[k]===n?0:n;store.set("rating",rating);renderAssess()}));
+  const strong=list.filter(s=>(rating[s.L+s.i]||0)>=4), grow=list.filter(s=>{const r=rating[s.L+s.i]||0;return r>0&&r<=2});
+  $("assess-sum").innerHTML=`<div class="box"><b style="color:var(--ok)">Δυνατά σημεία (4–5)</b>${strong.length?`<ul>${strong.map(s=>`<li>${T[s.L].sk[s.i]}</li>`).join("")}</ul>`:`<p class="hint" style="margin-top:4px">Βαθμολόγησε τις δεξιότητες για να εμφανιστούν εδώ.</p>`}</div><div class="box"><b style="color:var(--warn)">Για ανάπτυξη (1–2)</b>${grow.length?`<ul>${grow.map(s=>`<li>${T[s.L].sk[s.i]}</li>`).join("")}</ul>`:`<p class="hint" style="margin-top:4px">Βαθμολόγησε τις δεξιότητες για να εμφανιστούν εδώ.</p>`}</div>`;
+}
+
+/* κωδικός τάξης */
+function classCode(){
+  const p=pickedList(), c=pathCounts(p);
+  const cls=($("st-class").value||"-").trim().replace(/[|\s]+/g,"");
+  return `HOL|${cls}|${order.join("")}|${ORD.map(k=>scores[k]).join(",")}|${c.ΑΕΙ},${c.ΣΑΕΚ},${c.ΕΠΑΛ},${c.Ειδικές}`;
+}
+function updCode(){if(valid())$("classcode").textContent=classCode()}
+$("copy-code").addEventListener("click",()=>{
+  const t=$("classcode").textContent;
+  const sel=()=>{const r=document.createRange();r.selectNodeContents($("classcode"));const s=getSelection();s.removeAllRanges();s.addRange(r)};
+  try{navigator.clipboard.writeText(t).then(()=>{$("copy-msg").textContent="Αντιγράφηκε."},()=>{sel();$("copy-msg").textContent="Ο κωδικός επιλέχθηκε· πάτα Ctrl+C ή «Αντιγραφή»."})}catch(e){sel();$("copy-msg").textContent="Ο κωδικός επιλέχθηκε· πάτα Ctrl+C ή «Αντιγραφή»."}
+});
+
+function render(){
+  ["o1","o2","o3"].forEach((id,i)=>$(id).value=order[i]);
+  $("ex-pill").hidden=!isEx;
+  const v=valid(), msg=$("msg");
+  if(!v){msg.textContent="Διάλεξε τρεις διαφορετικούς τύπους.";msg.hidden=false}
+  else if(tieNote){msg.textContent=tieNote;msg.hidden=false}
+  else msg.hidden=true;
+  $("hex").innerHTML=hexSVG(LIVE,scores,order);
+  $("code").innerHTML=order.map(k=>`<span style="color:var(--${k})">${k}</span>`).join("");
+  $("types").innerHTML=order.map((k,i)=>`<li><span class="k">${i+1}</span><span><b style="color:var(--${k})">${T[k].n}</b>${T[k].d}</span></li>`).join("");
+  $("pdf-btn").disabled=!v;
+  if(!v){$("jobs").innerHTML="";$("jobs-hint").textContent="";$("filters").innerHTML="";$("skills").innerHTML="";renderAssess();return}
+  filter="Όλα";
+  analytics();
+  $("jobs-hint").textContent=`Τρίγωνο ${keyOf().split("").map(k=>T[k].n).join(" – ")}: 30 επαγγέλματα, ταξινομημένα από την πιο ισχυρή ταύτιση με τη σειρά ${order.join("")} προς τη λιγότερη. Κάτω από κάθε επάγγελμα φαίνονται 2 δεξιότητες από κάθε τύπο του κωδικού του. Τσέκαρε όσα σε τραβούν.`;
+  $("skills").innerHTML=order.map(k=>`<div class="skillcol" style="--c:var(--${k})"><b>Δεξιότητες ${k} · ${T[k].n}</b><ul>${T[k].sk.map(s=>`<li>${s}</li>`).join("")}</ul></div>`).join("");
+  renderJobs();renderAssess();updCode();
+}
+rank();render();
+
+/* ---------- ΠΡΟΒΟΛΕΣ ---------- */
+function route(){
+  const h=location.hash.replace("#","");const v=h==="print"?h:"student";
+  ["student","print"].forEach(x=>{$("v-"+x).hidden=x!==v});
+  if(v==="print"){$("print-body").innerHTML=valid()?pdfHTML():`<p class="hint">Διάλεξε πρώτα τρεις διαφορετικούς τύπους στο φύλλο μαθητή.</p>`}else $("print-body").innerHTML="";
+}
+window.addEventListener("hashchange",route);route();
+
+/* ---------- PDF ---------- */
+let dl=null;
+/* εκτός πλαισίου claude.ai (νέα καρτέλα, αποθηκευμένο αρχείο): απευθείας λήψη από τον browser */
+function directDownload(data,fname,type){
+  const blob=data instanceof Blob?data:new Blob([data],{type:type||"application/octet-stream"});
+  const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=fname;a.rel="noopener";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);
+}
+async function offerFile(data,fname,type){
+  if(dl){const r=await dl.save({filename:fname,data});return r.status==="saved"?"saved":"other"}
+  directDownload(data,fname,type);return "direct";
+}
+
+function loadScript(srcs){return new Promise((res,rej)=>{let i=0;const next=()=>{if(i>=srcs.length)return rej(new Error("load"));const s=document.createElement("script");s.src=srcs[i++];s.onload=res;s.onerror=next;document.head.appendChild(s)};next()})}
+
+function pdfHTML(){
+  const P=PRINT, K=computeKPIs(), list=jobsScored(), key=keyOf(), picked=pickedList();
+  const name=$("st-name").value||"________________", cls=$("st-class").value||"____", date=$("st-date").value?new Date($("st-date").value).toLocaleDateString("el-GR"):"____";
+  const img="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(hexSVG(P,scores,order));
+  const kc={hi:P.S,md:P.ink,lo:"#a35b00"};
+  const scaleMax=Math.max(10,Math.ceil(Math.max(...ORD.map(k=>scores[k]))/10)*10);
+  const th=`style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:${P.muted};padding:4px 5px;border-bottom:1.5px solid ${P.ink}"`;
+  const td=`style="padding:3px 5px;border-bottom:1px solid ${P.line};vertical-align:top"`;
+  const ans=id=>esc($(id).value||"").replace(/\n/g,"<br>")||`<span style="color:${P.muted}">—</span>`;
+  const H=t=>`<div style="font-size:13.5px;font-weight:800;margin-top:12px;border-bottom:1px solid ${P.ink};padding-bottom:2px">${t}</div>`;
+  const as=assessSkills().list.filter(s=>rating[s.L+s.i]);
+  return `<div style="font-family:${P.font};color:${P.ink};background:#fff;font-size:10.5px;line-height:1.42;width:700px;padding:2px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid ${P.ink};padding-bottom:6px">
+    <div><div style="font-size:21px;font-weight:800">Το Τρίγωνο του Χόλαντ</div><div style="color:${P.muted}">Φύλλο εργασίας Α΄ Λυκείου · βαθμολογίες από το ερωτηματολόγιο ΕΟΠΠΕΠ</div></div>
+    <div style="text-align:right;font-size:11px"><b>${esc(name)}</b><br>Τμήμα ${esc(cls)} · ${esc(date)}</div>
+  </div>
+  ${H("Βήματα 1–2 · Οι βαθμολογίες μου και το τρίγωνό μου")}
+  <div class="avoid" style="display:flex;gap:12px;align-items:center;margin-top:8px">
+    <img src="${img}" style="width:330px;height:212px">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:9.5px;color:${P.muted};text-transform:uppercase;letter-spacing:.06em;font-weight:700">Κωδικός Χόλαντ</div>
+      <div style="font-size:30px;font-weight:800;letter-spacing:.08em">${order.map(k=>`<span style="color:${P[k]}">${k}</span>`).join("")}</div>
+      ${order.map((k,i)=>`<div style="margin-top:3px"><b style="color:${P[k]}">${i+1}. ${T[k].n}</b> · ${T[k].d}</div>`).join("")}
+      <div style="margin-top:6px">${sorted.map(k=>`<div style="display:flex;align-items:center;gap:6px;margin-top:2px"><span style="width:92px;font-weight:600;color:${order.includes(k)?P[k]:P.muted}">${k} · ${T[k].n}</span><span style="flex:1;height:8px;background:#e9edf3;border-radius:2px;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:${scores[k]/scaleMax*100}%;background:${P[k]};opacity:${order.includes(k)?1:.35};border-radius:2px"></span></span><span style="width:22px;text-align:right">${scores[k]}</span></div>`).join("")}</div>
+    </div>
+  </div>
+  ${H("Βήμα 3 · Τι δείχνουν τα δεδομένα μου")}
+  <div class="avoid" style="display:flex;gap:6px;margin-top:8px">${K.map(k=>`<div style="flex:1;border:1px solid ${P.line};border-radius:5px;padding:5px 7px"><div style="font-size:9px;color:${P.muted};text-transform:uppercase;font-weight:700">${k.l}</div><div style="font-size:15px;font-weight:800">${k.v} <span style="font-size:9.5px;color:${kc[k.c[0]]}">${k.c[1]}</span></div><div style="font-size:9px;color:${P.muted}">${k.s}</div></div>`).join("")}</div>
+  <div class="avoid" style="margin-top:6px;font-size:10px">${$("read").innerHTML}</div>
+  ${H(`Βήμα 4 · Τα 30 επαγγέλματα του τριγώνου ${key}, κατά ταύτιση με τη σειρά ${order.join("")}`)}
+  <table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:9.8px">
+    <thead><tr><th ${th}>✓</th><th ${th}>Επάγγελμα</th><th ${th}>Κωδ.</th><th ${th}>Ταύτ.</th><th ${th}>Διαδρομή</th><th ${th}>Βασικές δεξιότητες</th></tr></thead>
+    <tbody>${list.map(j=>{const t=tier(j.m), ck=checks[key+"|"+j.n], dm=demandOf(j);return `<tr style="${ck?"background:#e8eefc;":""}"><td ${td}><span style="display:inline-block;width:10px;height:10px;border:1.5px solid ${P.ink};border-radius:2px;text-align:center;line-height:8px;font-weight:800;font-size:9px">${ck?"✓":""}</span></td><td ${td}><b>${esc(j.n)}</b>${dm?`<br><span style="color:${P.S};font-size:8.5px;font-weight:700">↑ ζήτηση: ${dm}</span>`:""}</td><td ${td}><b>${[...j.c].map(L=>`<span style="color:${P[L]}">${L}</span>`).join("")}</b></td><td ${td}>${Math.round(j.m/28*100)}%</td><td ${td}>${pathLabels(j).map(x=>esc(x.txt)).join(" · ")}</td><td style="padding:3px 5px;border-bottom:1px solid ${P.line};vertical-align:top;font-size:8.8px;color:${P.muted}">${[...j.c].map(L=>`<b style="color:${P[L]}">${L}</b> `+j.sk.filter(x=>x[0]===L).map(x=>T[L].sk[x[1]]).join(", ")).join("<br>")}</td></tr>`}).join("")}</tbody>
+  </table>
+  <div style="font-size:8.8px;color:${P.muted};margin-top:3px">ΑΕΙ Πεδία: 1 Ανθρωπιστικές, Νομικές & Κοινωνικές · 2 Θετικές & Τεχνολογικές · 3 Υγείας & Ζωής · 4 Οικονομίας & Πληροφορικής. ΣΑΕΚ = πρώην ΙΕΚ. Ταύτιση = δείκτης M του Iachan. Ζήτηση = κλάδος με αυξημένη ζήτηση (Cedefop 2025, ManpowerGroup 2025, ΣΕΒ).</div>
+  <div class="avoid" style="margin-top:8px;border:1px solid ${P.line};border-radius:5px;padding:6px 9px">
+    <div style="font-size:11px"><b>Θέλω να σπουδάσω κοντά σε:</b> ${city?`<b style="background:#fff4cc">${esc(city)}</b>`:`<span style="color:${P.muted}">δεν επιλέχθηκε πόλη</span>`}</div>
+  </div>
+  <div class="avoid" style="margin-top:6px;border:1px solid ${P.line};border-radius:5px;padding:6px 9px;font-size:9.4px;line-height:1.4">
+    <div style="font-size:11px;font-weight:800;margin-bottom:3px">Οδηγός διαδρομών σπουδών και ζήτησης στην αγορά εργασίας</div>
+    <div><b>ΑΕΙ · Πεδίο:</b> Πανεπιστήμιο με Πανελλαδικές στη Γ΄ Λυκείου και ελάχιστη βάση εισαγωγής. 1 Ανθρωπιστικές, Νομικές & Κοινωνικές → ομάδα Ανθρωπιστικών · 2 Θετικές & Τεχνολογικές → ομάδα Θετικών · 3 Υγείας & Ζωής → ομάδα Υγείας · 4 Οικονομίας & Πληροφορικής → ομάδα Οικονομίας & Πληροφορικής. Κάποια τμήματα ζητούν ειδικό μάθημα (σχέδιο, ξένη γλώσσα, μουσικά, αθλητικές δοκιμασίες). Τμήματα: Μηχανογραφικό 2026.</div>
+    <div style="margin-top:2px"><b>ΣΑΕΚ (πρώην ΙΕΚ):</b> Μετά το Λύκειο, χωρίς Πανελλαδικές, περίπου 2–2,5 χρόνια με πρακτική άσκηση, δίπλωμα επιπέδου 5. Οι δημόσιες είναι δωρεάν.</div>
+    <div style="margin-top:2px"><b>ΕΠΑΛ · Τομέας:</b> Τομέας στη Β΄, ειδικότητα στη Γ΄, πτυχίο επιπέδου 4. Συνέχεια σε ΑΕΙ (Πανελλαδικές ΕΠΑΛ), ΣΑΕΚ ή τάξη μαθητείας.</div>
+    <div style="margin-top:2px"><b>Ειδικές σχολές:</b> Στρατιωτικές και Σωμάτων Ασφαλείας (Πανελλαδικές + δοκιμασίες), Ακαδημίες Εμπορικού Ναυτικού, Δραματικές/Χορού (δικές τους εξετάσεις), Ωδείο, Σχολή Ξεναγών, άδεια/πιστοποίηση, διαγωνισμός δημοσίου (ΑΣΕΠ).</div>
+    <div style="margin-top:2px"><b>↑ Ζήτηση:</b> Ο κλάδος του επαγγέλματος έχει σήμερα αυξημένη ζήτηση ή ελλείψεις στην Ελλάδα (Cedefop 2025, ManpowerGroup 2025, ΣΕΒ/ΟΚΕ). Αφορά τον κλάδο, όχι το συγκεκριμένο επάγγελμα.</div>
+    <div style="margin-top:2px;color:${P.muted}">Οι Πανελλαδικές για την τωρινή Α΄ Λυκείου γίνονται το 2029· οι κανόνες μπορεί να αλλάξουν ως τότε.</div>
+  </div>
+  ${picked.some(j=>j.d.length)?H("Βήμα 4 · Πού σπουδάζω: τα επαγγέλματα που τσέκαρα")+picked.filter(j=>j.d.length).map(j=>`<div class="avoid" style="margin-top:5px"><b>${esc(j.n)}</b>${j.d.map(d=>{const D=DEPT[d];return `<div style="font-size:9.5px;margin-left:8px"><b>${esc(D.n)}</b> (Πεδίο ${D.f}${D.sp?" · ειδικό μάθημα: "+esc(D.sp):""}): ${D.L.map(x=>`${esc(x.i)} · ${city&&x.c.startsWith(city)?`<b style="background:#fff4cc">${esc(x.c)}</b>`:esc(x.c)}`).join("; ")}</div>`}).join("")}</div>`).join(""):""}
+  <div class="avoid">${H("Βήμα 5 · Αυτοαξιολόγηση δεξιοτήτων (1 = καθόλου ακόμα, 5 = πολύ καλά)")}${as.length?`<div style="columns:2;column-gap:16px;margin-top:4px">${as.map(s=>`<div style="break-inside:avoid"><b style="color:${P[s.L]}">${s.L}</b> ${T[s.L].sk[s.i]}: <b>${rating[s.L+s.i]}</b></div>`).join("")}</div>`:`<div style="color:${P.muted};margin-top:4px">Δεν συμπληρώθηκε.</div>`}</div>
+  ${H("Βήμα 6 · Σκέψου και γράψε")}
+  ${[["q1","1. Συμφωνείς με το τρίγωνό σου; Τι σου λένε οι δείκτες;"],["q2","2. Δύο επαγγέλματα που τσέκαρες: ποιες δεξιότητες έχεις ήδη και ποιες θέλεις να αναπτύξεις;"],["q3","3. Ποια διαδρομή σπουδών και ποια πόλη σε ενδιαφέρουν; Τι πρέπει να ψάξεις ακόμα;"]].map(([id,q])=>`<div class="avoid" style="margin-top:6px"><b>${q}</b><div style="border:1px solid ${P.line};border-radius:4px;min-height:42px;padding:5px 7px;margin-top:3px">${ans(id)}</div></div>`).join("")}
+  <div style="font-size:8.8px;color:${P.muted};margin-top:8px">Οι λίστες είναι ενδεικτικές. Ο κωδικός Χόλαντ δείχνει ενδιαφέροντα, όχι ικανότητες. Τμήματα ΑΕΙ: Μηχανογραφικό Δελτίο 2026 (ΥΠΑΙΘΑ). Συζήτησέ τα με τον σύμβουλο σταδιοδρομίας του σχολείου.</div>
+  <div style="font-size:8.8px;color:${P.muted};margin-top:4px">Κωδικός για τον εκπαιδευτικό: <span style="font-family:monospace;color:${P.ink}">${esc(classCode())}</span></div>
+  </div>`;
+}
+
+async function buildPdfBlob(){
+  if(!window.html2pdf) await loadScript(["https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js","https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"]);
+  const stage=$("pdfstage");stage.innerHTML=pdfHTML();
+  await new Promise(r=>{const im=stage.querySelector("img");if(!im||im.complete)r();else{im.onload=r;im.onerror=r}});
+  const sx=window.scrollX, sy=window.scrollY;
+  window.scrollTo(0,0);
+  try{
+    return await html2pdf().set({margin:[10,10,12,10],image:{type:"jpeg",quality:.95},html2canvas:{scale:2,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["tr",".avoid"]}}).from(stage.firstElementChild).outputPdf("blob");
+  }finally{stage.innerHTML="";window.scrollTo(sx,sy)}
+}
+function doPrint(){try{window.print()}catch(e){}}
+$("print-btn").addEventListener("click",()=>{if(!valid())return;if(location.hash!=="#print"){location.hash="#print";setTimeout(doPrint,400)}else doPrint()});
+$("print-now").addEventListener("click",doPrint);
+$("pdf-btn2").addEventListener("click",()=>makePdf($("pdf-btn2"),$("pdf-msg2")));
+let resetArmed=false;
+$("reset-btn").addEventListener("click",()=>{
+  if(!resetArmed){resetArmed=true;$("reset-btn").textContent="Πάτα ξανά για επιβεβαίωση";$("reset-msg").textContent="Θα σβηστούν όλες οι απαντήσεις σε αυτή τη συσκευή.";setTimeout(()=>{resetArmed=false;$("reset-btn").textContent="Καθαρισμός για νέο μαθητή";$("reset-msg").textContent=""},6000);return}
+  try{Object.keys(localStorage).filter(k=>k.startsWith("hol:")&&k!=="hol:class").forEach(k=>localStorage.removeItem(k))}catch(e){}
+  location.hash="";location.reload();
+});
+$("pdf-btn").addEventListener("click",()=>makePdf($("pdf-btn"),$("pdf-msg")));
+async function makePdf(btn,msg){
+  if(!valid())return;
+  const keep=msg.textContent;
+  btn.disabled=true;msg.textContent="Δημιουργία PDF…";
+  try{
+    const blob=await buildPdfBlob();
+    const GR={α:"a",ά:"a",β:"v",γ:"g",δ:"d",ε:"e",έ:"e",ζ:"z",η:"i",ή:"i",θ:"th",ι:"i",ί:"i",ϊ:"i",ΐ:"i",κ:"k",λ:"l",μ:"m",ν:"n",ξ:"x",ο:"o",ό:"o",π:"p",ρ:"r",σ:"s",ς:"s",τ:"t",υ:"y",ύ:"y",ϋ:"y",ΰ:"y",φ:"f",χ:"ch",ψ:"ps",ω:"o",ώ:"o"};
+    const nm=[...($("st-name").value||"mathitis").trim().toLowerCase()].map(c=>GR[c]??c).join("").replace(/\s+/g,"_").replace(/[^a-z0-9_-]/g,"")||"mathitis";
+    const fname=`Holland_${order.join("")}_${nm}.pdf`;
+    const r=await offerFile(blob,fname,"application/pdf");
+    msg.textContent=r==="saved"?`Αποθηκεύτηκε: ${fname}`:r==="direct"?`Η λήψη του ${fname} ξεκίνησε. Αν δεν εμφανίστηκε, χρησιμοποίησε τη «Σελίδα εκτύπωσης».`:keep;
+  }catch(e){
+    msg.textContent=e&&e.code==="declined"?"Η λήψη ακυρώθηκε.":e&&e.code==="rate_limited"?"Υπάρχει ήδη ανοιχτό παράθυρο λήψης. Δοκίμασε ξανά σε λίγο.":"Δεν ήταν δυνατή η δημιουργία του PDF. Δοκίμασε ξανά.";
+  }finally{btn.disabled=!valid()}
+}
+</script>
+
+</body>
+</html>
